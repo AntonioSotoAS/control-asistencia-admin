@@ -1,21 +1,5 @@
 import { baseApi } from "@/shared/services/baseApi";
-
-export type LoginRequest = {
-  identificador: string;
-  password: string;
-};
-
-export type LoginResponse = {
-  data: {
-    token: string;
-    usuario?: {
-      id?: number | string;
-      nombre?: string;
-      rol?: string;
-      correo?: string;
-    };
-  };
-};
+import type { LoginRequest, LoginResponse } from "../types/auth.types";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { Modal } from "@/components/ui/Modal";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { Modal, Button, Input } from "@/components/ui";
 import { QrCode, ScanLine, CheckCircle2 } from "lucide-react";
 import type { RegistroAsistenciaPayload } from "../types/asistencia.types";
 

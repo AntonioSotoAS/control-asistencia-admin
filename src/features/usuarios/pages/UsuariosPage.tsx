@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { UsuariosTable } from "../components/UsuariosTable";
 import { UsuarioModal } from "../components/UsuarioModal";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui";
 import { UserPlus } from "lucide-react";
 import {
   useGetUsuariosQuery,

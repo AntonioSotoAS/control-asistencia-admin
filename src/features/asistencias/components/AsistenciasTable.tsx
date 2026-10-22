@@ -5,8 +5,8 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from "@/components/ui/Table";
-import { Badge } from "@/components/ui/Badge";
+  Badge,
+} from "@/components/ui";
 import { QrCode, ScanFace, FileEdit, CalendarCheck } from "lucide-react";
 import type { Asistencia } from "../types/asistencia.types";
 
@@ -44,11 +44,11 @@ export function AsistenciasTable({
   const getMethodIcon = (metodo: Asistencia["metodo"]) => {
     switch (metodo) {
       case "QR":
-        return <QrCode className="w-3.5 h-3.5 text-guinda" title="Código QR" />;
+        return <QrCode className="w-3.5 h-3.5 text-guinda" />;
       case "BIOMETRICO":
-        return <ScanFace className="w-3.5 h-3.5 text-emerald-600" title="Biométrico" />;
+        return <ScanFace className="w-3.5 h-3.5 text-emerald-600" />;
       default:
-        return <FileEdit className="w-3.5 h-3.5 text-olivo" title="Manual" />;
+        return <FileEdit className="w-3.5 h-3.5 text-olivo" />;
     }
   };
 

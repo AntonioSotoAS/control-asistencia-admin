@@ -5,9 +5,9 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from "@/components/ui/Table";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+  Badge,
+  Button,
+} from "@/components/ui";
 import { CheckSquare, FileText, CheckCircle2 } from "lucide-react";
 import type { Justificacion } from "../types/justificacion.types";
 

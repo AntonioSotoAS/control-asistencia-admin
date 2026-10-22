@@ -1,5 +1,5 @@
 import { Search, UserPlus, Filter } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui";
 
 interface BeneficiarioFilterProps {
   searchTerm: string;

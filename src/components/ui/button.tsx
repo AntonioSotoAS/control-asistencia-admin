@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "icon" | "icon-sm" | "icon-lg";
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
@@ -33,6 +33,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       sm: "text-xs px-3 py-1.5 rounded-[14px] gap-1.5",
       md: "text-sm px-4 py-2.5 rounded-field gap-2",
       lg: "text-base px-6 py-3 rounded-field gap-2.5",
+      icon: "h-9 w-9 rounded-field p-0",
+      "icon-sm": "h-7 w-7 rounded-[12px] p-0",
+      "icon-lg": "h-11 w-11 rounded-field p-0",
     };
 
     const variantStyles = {

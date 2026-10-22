@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/Card";
+import { Card } from "@/components/ui";
 import { Users, CheckCircle, AlertTriangle, Flag, ArrowUpRight } from "lucide-react";
 import type { DashboardResumen } from "../types/dashboard.types";
 

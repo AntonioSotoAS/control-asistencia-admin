@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { Button, Card } from "@/components/ui";
 import { QrCode, UserPlus, FileSpreadsheet, Flag } from "lucide-react";
 
 export function QuickActions() {

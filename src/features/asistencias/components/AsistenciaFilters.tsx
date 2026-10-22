@@ -1,5 +1,5 @@
 import { Search, QrCode, Filter } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui";
 
 interface AsistenciaFiltersProps {
   searchTerm: string;

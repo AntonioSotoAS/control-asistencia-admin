@@ -1,6 +1,6 @@
 import { useLocation } from "react-router";
 import { Menu, Search, Bell, Radio } from "lucide-react";
-import { Badge } from "@/components/ui/Badge";
+import { Badge } from "@/components/ui";
 import { useAppSelector } from "@/app/hooks";
 
 interface AppHeaderProps {

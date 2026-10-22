@@ -5,10 +5,10 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from "@/components/ui/Table";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { Edit2, Shield, UserCog, UserCheck } from "lucide-react";
+  Badge,
+  Button,
+} from "@/components/ui";
+import { Edit2 } from "lucide-react";
 import type { Usuario } from "../types/usuario.types";
 
 interface UsuariosTableProps {

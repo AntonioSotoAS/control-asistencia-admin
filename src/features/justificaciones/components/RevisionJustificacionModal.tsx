@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { Modal } from "@/components/ui/Modal";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { Modal, Button, Badge } from "@/components/ui";
 import { CheckCircle, XCircle, FileText, User, Calendar, Flag } from "lucide-react";
 import type { Justificacion, ResponderJustificacionPayload } from "../types/justificacion.types";
 

@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { Shield, Lock, User, Eye, EyeOff, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { Button, Input } from "@/components/ui";
 import { useLoginMutation } from "../services/authApi";
 import { useAppDispatch } from "@/app/hooks";
 import { setCredentials } from "../services/authSlice";
@@ -36,13 +35,14 @@ export function LoginPage() {
       }).unwrap();
 
       if (response?.data?.token) {
+        const usuarioData = response.data.usuario;
         dispatch(
           setCredentials({
             token: response.data.token,
-            user: response.data.usuario || {
+            user: usuarioData || {
               identificador,
-              nombre: response.data.usuario?.nombre || "Administrador",
-              rol: response.data.usuario?.rol || "admin",
+              nombre: "Administrador General",
+              rol: "admin",
             },
           })
         );

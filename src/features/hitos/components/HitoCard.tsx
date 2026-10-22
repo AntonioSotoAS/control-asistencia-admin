@@ -1,6 +1,4 @@
-import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Card, Badge, Button } from "@/components/ui";
 import { Calendar, Clock, MapPin, Edit2 } from "lucide-react";
 import type { Hito } from "../types/hito.types";
 

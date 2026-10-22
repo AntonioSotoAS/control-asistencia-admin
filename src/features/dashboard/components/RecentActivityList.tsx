@@ -1,5 +1,4 @@
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import { Card, CardHeader, CardTitle, CardDescription, Badge } from "@/components/ui";
 import type { ActividadReciente } from "../types/dashboard.types";
 
 interface RecentActivityListProps {

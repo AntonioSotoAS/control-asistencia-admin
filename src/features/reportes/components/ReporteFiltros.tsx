@@ -1,5 +1,5 @@
 import { Download, Calendar, Filter } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui";
 import type { ReporteFiltrosState } from "../types/reporte.types";
 
 interface ReporteFiltrosProps {

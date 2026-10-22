@@ -5,9 +5,9 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from "@/components/ui/Table";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+  Badge,
+  Button,
+} from "@/components/ui";
 import { Edit2, Eye, UserX } from "lucide-react";
 import type { Beneficiario } from "../types/beneficiario.types";
 

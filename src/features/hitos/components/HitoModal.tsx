@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal } from "@/components/ui/Modal";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { Modal, Button, Input } from "@/components/ui";
 import type { Hito } from "../types/hito.types";
 
 interface HitoModalProps {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { HitosList } from "../components/HitosList";
 import { HitoModal } from "../components/HitoModal";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui";
 import { Plus } from "lucide-react";
 import {
   useGetHitosQuery,
