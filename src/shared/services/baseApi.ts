@@ -8,6 +8,7 @@ export const baseApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "/api",
     prepareHeaders: (headers) => {
+      headers.set("Accept", "application/json");
       const token = sessionStorage.getItem("token");
 
       if (token) {

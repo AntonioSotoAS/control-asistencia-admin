@@ -1,10 +1,60 @@
+export type RolUsuario =
+  | "superadmin"
+  | "admin"
+  | "asistente"
+  | "beneficiario"
+  | "juez";
+
+export type EstadoUsuario = "activo" | "inactivo";
+
+export interface PersonaInfo {
+  id: number;
+  dni?: string;
+  nombres?: string;
+  apellidos?: string;
+  expediente?: string;
+  telefono?: string;
+  correo?: string;
+  [key: string]: unknown;
+}
+
 export interface Usuario {
-  id: string | number;
+  id: number;
+  persona_id: number;
   identificador: string;
-  nombre: string;
-  rol: "ADMIN" | "SUPERVISOR" | "OPERADOR";
-  correo: string;
-  activo: boolean;
-  ultimoAcceso?: string;
-  fechaCreacion?: string;
+  rol: RolUsuario;
+  estado: EstadoUsuario;
+  created_at?: string;
+  updated_at?: string;
+  persona?: PersonaInfo;
+  // Campos complementarios en caso de join directo del backend
+  nombre?: string;
+  correo?: string;
+}
+
+export interface CrearUsuarioPayload {
+  persona_id: number;
+  identificador: string;
+  password: string;
+  rol: RolUsuario;
+  estado?: EstadoUsuario;
+}
+
+export interface ActualizarUsuarioPayload {
+  id: number;
+  persona_id?: number;
+  identificador?: string;
+  password?: string;
+  rol?: RolUsuario;
+  estado?: EstadoUsuario;
+}
+
+export interface ListarUsuariosParams {
+  q?: string;
+}
+
+export interface ApiErrorResponse {
+  message?: string;
+  mensaje?: string;
+  errors?: Record<string, string[]>;
 }
