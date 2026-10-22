@@ -8,6 +8,7 @@ import { AsistenciasPage } from "@/features/asistencias/pages/AsistenciasPage";
 import { JustificacionesPage } from "@/features/justificaciones/pages/JustificacionesPage";
 import { ReportesPage } from "@/features/reportes/pages/ReportesPage";
 import { UsuariosPage } from "@/features/usuarios/pages/UsuariosPage";
+import { PersonasPage } from "@/features/personas/pages/PersonasPage";
 
 export function AppRouter() {
   return (
@@ -24,6 +25,7 @@ export function AppRouter() {
         <Route path="justificaciones" element={<JustificacionesPage />} />
         <Route path="reportes" element={<ReportesPage />} />
         <Route path="usuarios" element={<UsuariosPage />} />
+        <Route path="personas" element={<PersonasPage />} />
       </Route>
 
       {/* Catch-all redirect */}

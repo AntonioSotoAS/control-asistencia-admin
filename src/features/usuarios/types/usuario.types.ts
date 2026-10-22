@@ -9,12 +9,14 @@ export type EstadoUsuario = "activo" | "inactivo";
 
 export interface PersonaInfo {
   id: number;
+  nombre?: string;
   dni?: string;
   nombres?: string;
   apellidos?: string;
-  expediente?: string;
-  telefono?: string;
-  correo?: string;
+  expediente?: string | null;
+  telefono?: string | null;
+  correo?: string | null;
+  email?: string | null;
   [key: string]: unknown;
 }
 

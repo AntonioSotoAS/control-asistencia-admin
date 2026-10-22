@@ -36,6 +36,10 @@ const routeTitles: Record<string, { title: string; subtitle: string }> = {
     title: "Administración de Usuarios",
     subtitle: "Gestión de operadores, supervisores y permisos",
   },
+  "/personas": {
+    title: "Padrón de Personas",
+    subtitle: "Registro de ciudadanos, beneficiarios y expedientes",
+  },
 };
 
 export function AppHeader({ onToggleSidebar }: AppHeaderProps) {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Input } from "@/components/ui";
 import { Eye, EyeOff, Search, UserCheck, AlertCircle } from "lucide-react";
-import { useGetPersonasQuery } from "../services/usuariosApi";
+import { useGetPersonasQuery, type Persona } from "@/features/personas";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import type {
   Usuario,
@@ -47,7 +47,7 @@ export function UsuarioModal({
 
   // Selector / buscador de personas
   const [searchPersona, setSearchPersona] = useState("");
-  const [selectedPersona, setSelectedPersona] = useState<PersonaInfo | null>(null);
+  const [selectedPersona, setSelectedPersona] = useState<Persona | PersonaInfo | null>(null);
   const debouncedSearchPersona = useDebounce(searchPersona, 350);
 
   const { data: personasEncontradas, isFetching: isSearchingPersonas } =
@@ -82,7 +82,7 @@ export function UsuarioModal({
     }
   }, [usuarioToEdit, isOpen]);
 
-  const handleSelectPersona = (p: PersonaInfo) => {
+  const handleSelectPersona = (p: Persona) => {
     setSelectedPersona(p);
     setPersonaId(p.id);
     // Sugerir identificador si está vacío (por ejemplo su DNI o expediente)
@@ -210,7 +210,7 @@ export function UsuarioModal({
             <div className="flex items-center justify-between p-3 rounded-field bg-white border border-linea text-xs">
               <div className="space-y-0.5">
                 <p className="font-bold text-carbon">
-                  {selectedPersona.nombres} {selectedPersona.apellidos}
+                  {selectedPersona.nombre || `Persona #${selectedPersona.id}`}
                 </p>
                 <p className="text-[11px] text-olivo">
                   DNI: {selectedPersona.dni || "S/N"} • ID: #{selectedPersona.id}
@@ -257,7 +257,7 @@ export function UsuarioModal({
                       className="w-full text-left p-2 rounded-md hover:bg-suave flex items-center justify-between text-xs transition cursor-pointer"
                     >
                       <span className="font-bold text-carbon">
-                        {p.nombres} {p.apellidos}
+                        {p.nombre}
                       </span>
                       <span className="text-[11px] font-mono text-olivo">
                         DNI: {p.dni || "—"} (ID: #{p.id})

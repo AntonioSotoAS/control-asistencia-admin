@@ -3,7 +3,6 @@ import type {
   Usuario,
   CrearUsuarioPayload,
   ActualizarUsuarioPayload,
-  PersonaInfo,
 } from "../types/usuario.types";
 
 export const usuariosApi = baseApi.injectEndpoints({
@@ -28,9 +27,9 @@ export const usuariosApi = baseApi.injectEndpoints({
       providesTags: (result) =>
         result
           ? [
-              ...result.map(({ id }) => ({ type: "Usuario" as const, id })),
-              { type: "Usuario", id: "LIST" },
-            ]
+            ...result.map(({ id }) => ({ type: "Usuario" as const, id })),
+            { type: "Usuario", id: "LIST" },
+          ]
           : [{ type: "Usuario", id: "LIST" }],
     }),
 
@@ -73,27 +72,6 @@ export const usuariosApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Usuario", id: "LIST" }],
     }),
-
-    // Para vincular la persona existente (GET /api/personas?q=...)
-    getPersonas: builder.query<PersonaInfo[], string | void>({
-      query: (q) => ({
-        url: "/personas",
-        params: q && q.trim() ? { q: q.trim() } : undefined,
-      }),
-      transformResponse: (response: unknown): PersonaInfo[] => {
-        if (Array.isArray(response)) {
-          return response as PersonaInfo[];
-        }
-        if (response && typeof response === "object" && "data" in response) {
-          const d = (response as { data: unknown }).data;
-          if (Array.isArray(d)) {
-            return d as PersonaInfo[];
-          }
-        }
-        return [];
-      },
-      providesTags: ["Persona"],
-    }),
   }),
 });
 
@@ -103,5 +81,4 @@ export const {
   useCrearUsuarioMutation,
   useActualizarUsuarioMutation,
   useEliminarUsuarioMutation,
-  useGetPersonasQuery,
 } = usuariosApi;
