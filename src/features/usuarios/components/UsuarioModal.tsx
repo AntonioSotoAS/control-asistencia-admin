@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Modal, Button, Input } from "@/components/ui";
 import { Eye, EyeOff, Search, UserCheck, AlertCircle } from "lucide-react";
 import { useGetPersonasQuery, type Persona } from "@/features/personas";
+import { useGetRolesQuery } from "@/features/roles";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import type {
   Usuario,
@@ -22,13 +23,21 @@ interface UsuarioModalProps {
   isLoading?: boolean;
 }
 
-const ROLES_DISPONIBLES: { value: RolUsuario; label: string; desc: string }[] = [
+const ROLES_FALLBACK: { value: string; label: string; desc: string }[] = [
   { value: "superadmin", label: "Superadministrador", desc: "Acceso total y gestión global" },
   { value: "admin", label: "Administrador", desc: "Gestión de sesiones, hitos y usuarios" },
   { value: "asistente", label: "Asistente / Operador", desc: "Registro y marcación de asistencias" },
   { value: "beneficiario", label: "Beneficiario", desc: "Consulta de sus asistencias y sesiones" },
   { value: "juez", label: "Juez / Supervisor", desc: "Supervisión y revisión de cumplimiento" },
 ];
+
+const DESCRIPCIONES_ROLES: Record<string, string> = {
+  superadmin: "Acceso total y gestión global del sistema",
+  admin: "Gestión de sesiones, hitos, personas y usuarios",
+  asistente: "Registro y marcación de asistencias y eventos",
+  beneficiario: "Consulta de sus asistencias, sesiones y estado",
+  juez: "Supervisión de cumplimiento judicial y reportes",
+};
 
 export function UsuarioModal({
   isOpen,
@@ -54,6 +63,21 @@ export function UsuarioModal({
     useGetPersonasQuery(debouncedSearchPersona, {
       skip: !isOpen || Boolean(usuarioToEdit),
     });
+
+  const { data: rolesApiList } = useGetRolesQuery(undefined, {
+    skip: !isOpen,
+  });
+
+  const rolesDisponibles = useMemo(() => {
+    if (rolesApiList && rolesApiList.length > 0) {
+      return rolesApiList.map((r) => ({
+        value: r.codigo,
+        label: r.nombre || r.codigo,
+        desc: DESCRIPCIONES_ROLES[r.codigo.toLowerCase()] || "Rol personalizado del sistema",
+      }));
+    }
+    return ROLES_FALLBACK;
+  }, [rolesApiList]);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
@@ -331,14 +355,14 @@ export function UsuarioModal({
               onChange={(e) => setRol(e.target.value as RolUsuario)}
               className="w-full rounded-field border border-linea bg-white px-4 py-2.5 text-sm text-carbon font-semibold focus:border-guinda focus:outline-none cursor-pointer"
             >
-              {ROLES_DISPONIBLES.map((r) => (
+              {rolesDisponibles.map((r) => (
                 <option key={r.value} value={r.value}>
                   {r.label} ({r.value})
                 </option>
               ))}
             </select>
             <p className="text-[11px] text-olivo">
-              {ROLES_DISPONIBLES.find((r) => r.value === rol)?.desc}
+              {rolesDisponibles.find((r) => r.value === rol)?.desc || "Perfil de usuario"}
             </p>
           </div>
 

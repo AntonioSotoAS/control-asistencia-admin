@@ -3,7 +3,8 @@ export type RolUsuario =
   | "admin"
   | "asistente"
   | "beneficiario"
-  | "juez";
+  | "juez"
+  | (string & {});
 
 export type EstadoUsuario = "activo" | "inactivo";
 

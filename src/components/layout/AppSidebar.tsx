@@ -9,6 +9,7 @@ import {
   BarChart3,
   UserCog,
   UserCheck,
+  ShieldCheck,
   LogOut,
   X,
   Shield,
@@ -43,6 +44,7 @@ const navItems: NavItem[] = [
   { name: "Reportes", to: "/reportes", icon: BarChart3 },
   { name: "Usuarios", to: "/usuarios", icon: UserCog },
   { name: "Personas", to: "/personas", icon: UserCheck },
+  { name: "Roles", to: "/roles", icon: ShieldCheck },
 ];
 
 export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {

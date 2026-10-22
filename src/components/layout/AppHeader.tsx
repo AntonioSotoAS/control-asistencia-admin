@@ -40,6 +40,10 @@ const routeTitles: Record<string, { title: string; subtitle: string }> = {
     title: "Padrón de Personas",
     subtitle: "Registro de ciudadanos, beneficiarios y expedientes",
   },
+  "/roles": {
+    title: "Catálogo de Roles y Permisos",
+    subtitle: "Administración de perfiles de acceso para usuarios",
+  },
 };
 
 export function AppHeader({ onToggleSidebar }: AppHeaderProps) {
