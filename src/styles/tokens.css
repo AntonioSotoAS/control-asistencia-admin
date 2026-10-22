@@ -1,0 +1,36 @@
+@theme inline {
+  --color-guinda: #800000;
+  --color-guinda-dark: #660000;
+  --color-guinda-light: #990000;
+  --color-guinda-soft: #fcf1f1;
+  --color-olivo: #6E6A59;
+  --color-olivo-dark: #585547;
+  --color-olivo-soft: #f4f3ed;
+  --color-carbon: #4A4A4A;
+  --color-carbon-light: #6c6c6c;
+  --color-suave: #F3F2EE;
+  --color-suave-alt: #EBE9E2;
+  --color-linea: #E4E2DB;
+
+  --radius-card: 28px;
+  --radius-tile: 22px;
+  --radius-field: 18px;
+
+  --font-sans: "Nunito Variable", sans-serif;
+}
+
+:root {
+  --primary: #800000;
+  --primary-foreground: #ffffff;
+  --secondary: #6E6A59;
+  --secondary-foreground: #ffffff;
+  --background: #fbfbfa;
+  --foreground: #2a2a2a;
+}
+
+.dark {
+  --background: #242424;
+  --card: #2E2E2E;
+  --foreground: #ffffff;
+  --primary: #800000;
+}
