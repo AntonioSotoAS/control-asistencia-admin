@@ -17,6 +17,7 @@ import {
 import { cn } from "@/shared/utils/cn";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { logout } from "@/features/auth/services/authSlice";
+import { useGetJustificacionesQuery } from "@/features/justificaciones";
 
 interface AppSidebarProps {
   isOpen: boolean;
@@ -39,7 +40,6 @@ const navItems: NavItem[] = [
     name: "Justificaciones",
     to: "/justificaciones",
     icon: FileCheck2,
-    badge: "3",
   },
   { name: "Reportes", to: "/reportes", icon: BarChart3 },
   { name: "Usuarios", to: "/usuarios", icon: UserCog },
@@ -51,6 +51,14 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const authUser = useAppSelector((state) => state.auth.user);
+
+  const { data: justificaciones } = useGetJustificacionesQuery(undefined, {
+    skip: !authUser,
+  });
+
+  const pendingJustificaciones = justificaciones?.filter(
+    (j) => (j.estado || "PENDIENTE").toUpperCase() === "PENDIENTE"
+  ).length;
 
   const handleLogout = () => {
     dispatch(logout());
@@ -137,18 +145,29 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
                       />
                       <span>{item.name}</span>
                     </div>
-                    {item.badge && (
-                      <span
-                        className={cn(
-                          "text-[11px] font-bold px-2 py-0.5 rounded-full transition-colors",
-                          isActive
-                            ? "bg-white text-guinda"
-                            : "bg-amber-100 text-amber-800"
-                        )}
-                      >
-                        {item.badge}
-                      </span>
-                    )}
+                    {(() => {
+                      const badgeValue =
+                        item.to === "/justificaciones"
+                          ? pendingJustificaciones && pendingJustificaciones > 0
+                            ? pendingJustificaciones
+                            : undefined
+                          : item.badge;
+
+                      if (!badgeValue) return null;
+
+                      return (
+                        <span
+                          className={cn(
+                            "text-[11px] font-bold px-2 py-0.5 rounded-full transition-colors",
+                            isActive
+                              ? "bg-white text-guinda"
+                              : "bg-amber-100 text-amber-800"
+                          )}
+                        >
+                          {badgeValue}
+                        </span>
+                      );
+                    })()}
                   </>
                 )}
               </NavLink>

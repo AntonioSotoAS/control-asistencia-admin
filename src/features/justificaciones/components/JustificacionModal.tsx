@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import { Modal, Button, Input } from "@/components/ui";
 import {
   Calendar,
-  FileText,
   UploadCloud,
   X,
   AlertCircle,
