@@ -17,6 +17,7 @@ import {
 import { cn } from "@/shared/utils/cn";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { logout } from "@/features/auth/services/authSlice";
+import { useLogoutMutation } from "@/features/auth/services/authApi";
 import { useGetJustificacionesQuery } from "@/features/justificaciones";
 
 interface AppSidebarProps {
@@ -60,7 +61,14 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
     (j) => (j.estado || "PENDIENTE").toUpperCase() === "PENDIENTE"
   ).length;
 
-  const handleLogout = () => {
+  const [logoutMutation] = useLogoutMutation();
+
+  const handleLogout = async () => {
+    try {
+      await logoutMutation().unwrap();
+    } catch {
+      // Proceder con el cierre local incluso si la red no responde
+    }
     dispatch(logout());
     navigate("/login");
   };

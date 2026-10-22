@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import { Modal, Button, Input } from "@/components/ui";
-import { QrCode, ScanLine, CheckCircle2 } from "lucide-react";
-import type { RegistroAsistenciaPayload } from "../types/asistencia.types";
+import { QrCode, ScanLine, AlertCircle, Fingerprint, Calendar, Clock } from "lucide-react";
+import type {
+  RegistrarSesionPayload,
+  ApiErrorResponse,
+  EstadoAsistencia,
+  MetodoAsistencia,
+} from "../types/asistencia.types";
 
 interface RegistroAsistenciaModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onRegistrar: (payload: RegistroAsistenciaPayload) => Promise<void>;
+  onRegistrar: (payload: RegistrarSesionPayload) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -16,48 +21,95 @@ export function RegistroAsistenciaModal({
   onRegistrar,
   isLoading,
 }: RegistroAsistenciaModalProps) {
-  const [dni, setDni] = useState("");
-  const [hitoId, setHitoId] = useState("1");
-  const [metodo, setMetodo] = useState<"QR" | "DNI_MANUAL" | "BIOMETRICO">("QR");
+  const today = new Date().toISOString().split("T")[0];
+  const currentTime = new Date().toTimeString().slice(0, 5);
+
+  const [personaId, setPersonaId] = useState<number | "">("");
+  const [fecha, setFecha] = useState(today);
+  const [hora, setHora] = useState(currentTime);
+  const [estado, setEstado] = useState<EstadoAsistencia>("PRESENTE");
+  const [metodo, setMetodo] = useState<MetodoAsistencia>("QR");
   const [observacion, setObservacion] = useState("");
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+
+  const resetForm = () => {
+    setPersonaId("");
+    setFecha(today);
+    setHora(currentTime);
+    setEstado("PRESENTE");
+    setMetodo("QR");
+    setObservacion("");
+    setErrorMessage(null);
+    setFieldErrors({});
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!dni || dni.length !== 8) return;
+    setErrorMessage(null);
+    setFieldErrors({});
 
-    await onRegistrar({
-      dni,
-      hitoId,
-      metodo,
-      observacion: observacion || undefined,
-    });
+    if (!fecha) {
+      setErrorMessage("La fecha de asistencia es requerida.");
+      return;
+    }
 
-    setSuccessMessage(`Asistencia registrada con éxito para DNI ${dni}`);
-    setDni("");
-    setObservacion("");
-    setTimeout(() => {
-      setSuccessMessage(null);
-    }, 2500);
+    try {
+      const payload: RegistrarSesionPayload = {
+        fecha,
+        hora: hora || undefined,
+        persona_id: personaId !== "" ? Number(personaId) : undefined,
+        estado,
+        metodo,
+        observacion: observacion.trim() || undefined,
+      };
+
+      await onRegistrar(payload);
+      resetForm();
+      onClose();
+    } catch (err: unknown) {
+      const error = err as { data?: ApiErrorResponse; error?: string };
+      const apiErrors = error.data?.errors || {};
+      setFieldErrors(apiErrors);
+      const msg =
+        error.data?.message ||
+        error.data?.mensaje ||
+        error.error ||
+        "Error al registrar la asistencia en el servidor.";
+      setErrorMessage(msg);
+    }
   };
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
-      title="Marcar Asistencia"
-      description="Registra la asistencia en tiempo real mediante QR, huella o DNI manual."
+      onClose={() => {
+        resetForm();
+        onClose();
+      }}
+      title="Registrar Marcación de Asistencia"
+      description="Registra la asistencia de una persona conectando directamente con el endpoint POST /api/sesiones."
+      maxWidth="md"
       footer={
         <>
-          <Button variant="outline" size="sm" onClick={onClose} type="button">
-            Cerrar
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              resetForm();
+              onClose();
+            }}
+            disabled={isLoading}
+            type="button"
+          >
+            Cancelar
           </Button>
           <Button
             variant="primary"
             size="sm"
             onClick={handleSubmit}
             isLoading={isLoading}
-            disabled={dni.length !== 8}
             type="submit"
           >
             Confirmar Registro
@@ -66,36 +118,34 @@ export function RegistroAsistenciaModal({
       }
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        {successMessage && (
-          <div className="p-3.5 rounded-field bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>{successMessage}</span>
+        {errorMessage && (
+          <div className="p-3.5 rounded-field bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5 animate-in fade-in">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
+            <div className="space-y-1">
+              <p className="font-bold">{errorMessage}</p>
+              {Object.keys(fieldErrors).length > 0 && (
+                <ul className="list-disc list-inside space-y-0.5 text-[11px] text-rose-700">
+                  {Object.entries(fieldErrors).map(([field, msgs]) => (
+                    <li key={field}>
+                      <strong>{field}:</strong> {msgs.join(", ")}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
         )}
 
+        {/* Método de Captura */}
         <div className="space-y-1.5 text-left">
           <label className="block text-sm font-semibold text-carbon">
-            Hito / Evento Activo
-          </label>
-          <select
-            value={hitoId}
-            onChange={(e) => setHitoId(e.target.value)}
-            className="w-full rounded-field border border-linea bg-white px-4 py-2.5 text-sm text-carbon font-semibold focus:border-guinda focus:outline-none"
-          >
-            <option value="1">Taller de Capacitación en Emprendimiento (08:30 - 12:30)</option>
-            <option value="2">Entrega de Módulos Nutricionales Octubre (09:00 - 14:00)</option>
-          </select>
-        </div>
-
-        <div className="space-y-1.5 text-left">
-          <label className="block text-sm font-semibold text-carbon">
-            Método de Captura
+            Método de Marcación
           </label>
           <div className="grid grid-cols-3 gap-2">
             {[
               { id: "QR", label: "Código QR", icon: QrCode },
-              { id: "BIOMETRICO", label: "Biométrico", icon: ScanLine },
-              { id: "DNI_MANUAL", label: "Manual", icon: ScanLine },
+              { id: "BIOMETRICO", label: "Biométrico", icon: Fingerprint },
+              { id: "DNI_MANUAL", label: "Manual / DNI", icon: ScanLine },
             ].map((m) => {
               const Icon = m.icon;
               const isSelected = metodo === m.id;
@@ -103,10 +153,10 @@ export function RegistroAsistenciaModal({
                 <button
                   key={m.id}
                   type="button"
-                  onClick={() => setMetodo(m.id as "QR" | "DNI_MANUAL" | "BIOMETRICO")}
+                  onClick={() => setMetodo(m.id)}
                   className={`flex flex-col items-center justify-center p-3 rounded-tile border text-xs font-bold transition-all cursor-pointer ${
                     isSelected
-                      ? "border-guinda bg-guinda/5 text-guinda"
+                      ? "border-guinda bg-guinda/5 text-guinda shadow-xs"
                       : "border-linea bg-white text-olivo hover:bg-suave"
                   }`}
                 >
@@ -118,21 +168,65 @@ export function RegistroAsistenciaModal({
           </div>
         </div>
 
-        <Input
-          label="DNI del Beneficiario"
-          placeholder="Ingrese o escanee 8 dígitos"
-          maxLength={8}
-          value={dni}
-          onChange={(e) => setDni(e.target.value.replace(/\D/g, ""))}
-          autoFocus
-          required
-        />
+        {/* Fecha y Hora */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="Fecha *"
+            type="date"
+            value={fecha}
+            onChange={(e) => setFecha(e.target.value)}
+            required
+            error={fieldErrors.fecha?.[0]}
+            leftIcon={<Calendar className="w-4 h-4 text-olivo" />}
+          />
+
+          <Input
+            label="Hora de Ingreso"
+            type="time"
+            value={hora}
+            onChange={(e) => setHora(e.target.value)}
+            error={fieldErrors.hora?.[0]}
+            leftIcon={<Clock className="w-4 h-4 text-olivo" />}
+          />
+        </div>
+
+        {/* Estado y Persona ID */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5 text-left">
+            <label className="block text-sm font-semibold text-carbon">
+              Condición / Estado
+            </label>
+            <select
+              value={estado}
+              onChange={(e) => setEstado(e.target.value)}
+              className="w-full rounded-field border border-linea bg-white px-3.5 py-2.5 text-xs text-carbon font-semibold focus:border-guinda focus:outline-none cursor-pointer"
+            >
+              <option value="PRESENTE">Presente (Asistencia en orden)</option>
+              <option value="TARDANZA">Tardanza (Fuera de tolerancia)</option>
+              <option value="JUSTIFICADO">Justificado (Permiso previo)</option>
+              <option value="FALTA">Falta (Inasistencia injustificada)</option>
+            </select>
+          </div>
+
+          <Input
+            label="ID de Persona (Opcional)"
+            type="number"
+            placeholder="Ej. 1"
+            value={personaId}
+            onChange={(e) =>
+              setPersonaId(e.target.value ? Number(e.target.value) : "")
+            }
+            helperText="Si se omite, registra para la sesión actual."
+            error={fieldErrors.persona_id?.[0]}
+          />
+        </div>
 
         <Input
-          label="Observaciones (opcional)"
-          placeholder="Ej. Ingreso autorizado con pase especial"
+          label="Observaciones o Constancia"
+          placeholder="Ej. Marcación registrada por operador central"
           value={observacion}
           onChange={(e) => setObservacion(e.target.value)}
+          error={fieldErrors.observacion?.[0]}
         />
       </form>
     </Modal>

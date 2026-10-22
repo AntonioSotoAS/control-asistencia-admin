@@ -2,6 +2,10 @@ import { useLocation } from "react-router";
 import { Menu, Search, Bell, Radio } from "lucide-react";
 import { Badge } from "@/components/ui";
 import { useAppSelector } from "@/app/hooks";
+import {
+  useCheckHealthQuery,
+  useGetPerfilQuery,
+} from "@/features/auth/services/authApi";
 
 interface AppHeaderProps {
   onToggleSidebar: () => void;
@@ -54,6 +58,23 @@ export function AppHeader({ onToggleSidebar }: AppHeaderProps) {
   };
   const authUser = useAppSelector((state) => state.auth.user);
 
+  const { data: healthData, isError: isHealthError } = useCheckHealthQuery(
+    undefined,
+    {
+      pollingInterval: 30000,
+    }
+  );
+
+  const { data: perfilData } = useGetPerfilQuery(undefined, {
+    skip: !authUser,
+  });
+
+  const isApiOnline =
+    !isHealthError &&
+    Boolean(healthData?.success || healthData?.data?.estado === "ok");
+
+  const displayName = perfilData?.nombre || authUser?.nombre || "Administrador";
+
   const formattedDate = new Intl.DateTimeFormat("es-PE", {
     weekday: "short",
     day: "numeric",
@@ -93,10 +114,29 @@ export function AppHeader({ onToggleSidebar }: AppHeaderProps) {
           />
         </div>
 
-        {/* API connection indicator */}
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
-          <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
-          <span className="text-[11px]">API Conectada</span>
+        {/* Real API connection indicator */}
+        <div
+          className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold ${
+            isApiOnline
+              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+              : "bg-rose-50 border-rose-200 text-rose-800"
+          }`}
+          title={
+            isApiOnline
+              ? "Servicio backend respondiendo OK (/api/health)"
+              : "Sin conexión al servicio backend (/api/health)"
+          }
+        >
+          <Radio
+            className={`w-3.5 h-3.5 ${
+              isApiOnline
+                ? "text-emerald-600 animate-pulse"
+                : "text-rose-600"
+            }`}
+          />
+          <span className="text-[11px]">
+            {isApiOnline ? "API Conectada" : "API Desconectada"}
+          </span>
         </div>
 
         {/* Date Pill */}
@@ -116,8 +156,11 @@ export function AppHeader({ onToggleSidebar }: AppHeaderProps) {
 
         {/* User initials */}
         <div className="flex items-center gap-2 pl-2 border-l border-linea/80">
-          <div className="w-9 h-9 rounded-full bg-guinda text-white flex items-center justify-center font-bold text-xs shadow-xs">
-            {authUser?.nombre ? authUser.nombre.charAt(0).toUpperCase() : "A"}
+          <div
+            className="w-9 h-9 rounded-full bg-guinda text-white flex items-center justify-center font-bold text-xs shadow-xs"
+            title={displayName}
+          >
+            {displayName.charAt(0).toUpperCase()}
           </div>
         </div>
       </div>

@@ -34,21 +34,27 @@ export function LoginPage() {
         password,
       }).unwrap();
 
-      if (response?.data?.token) {
-        const usuarioData = response.data.usuario;
+      const token = response.token || response.data?.token;
+      if (token) {
+        const usuarioData =
+          response.usuario ||
+          response.data?.usuario ||
+          response.user ||
+          response.data?.user;
+
         dispatch(
           setCredentials({
-            token: response.data.token,
+            token,
             user: usuarioData || {
               identificador,
-              nombre: "Administrador General",
+              nombre: "Usuario del Sistema",
               rol: "admin",
             },
           })
         );
         navigate(from, { replace: true });
       } else {
-        setErrorMessage("Respuesta inválida del servidor");
+        setErrorMessage("Respuesta inválida del servidor: token no recibido.");
       }
     } catch (err: unknown) {
       const error = err as { data?: { mensaje?: string; message?: string }; error?: string };
