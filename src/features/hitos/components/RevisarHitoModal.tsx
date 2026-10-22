@@ -42,9 +42,10 @@ export function RevisarHitoModal({
 
     try {
       await onRevisar({
-        id: hito.id,
+        id: hito.id!,
         valido,
-        estado: valido ? "aprobado" : "observado",
+        revision: valido ? "valida" : "observada",
+        estado: valido ? "activo" : "observado",
         observacion: observacion.trim() || undefined,
       });
       onClose();
@@ -137,11 +138,10 @@ export function RevisarHitoModal({
             <button
               type="button"
               onClick={() => setValido(true)}
-              className={`p-3.5 rounded-tile border text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${
-                valido
-                  ? "bg-emerald-50 border-emerald-300 text-emerald-800 shadow-xs"
-                  : "bg-white border-linea text-olivo hover:bg-suave"
-              }`}
+              className={`p-3.5 rounded-tile border text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${valido
+                ? "bg-emerald-50 border-emerald-300 text-emerald-800 shadow-xs"
+                : "bg-white border-linea text-olivo hover:bg-suave"
+                }`}
             >
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               <span>Fechas Válidas</span>
@@ -149,11 +149,10 @@ export function RevisarHitoModal({
             <button
               type="button"
               onClick={() => setValido(false)}
-              className={`p-3.5 rounded-tile border text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${
-                !valido
-                  ? "bg-rose-50 border-rose-300 text-rose-800 shadow-xs"
-                  : "bg-white border-linea text-olivo hover:bg-suave"
-              }`}
+              className={`p-3.5 rounded-tile border text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${!valido
+                ? "bg-rose-50 border-rose-300 text-rose-800 shadow-xs"
+                : "bg-white border-linea text-olivo hover:bg-suave"
+                }`}
             >
               <XCircle className="w-4 h-4 text-rose-600" />
               <span>Observar Fechas</span>

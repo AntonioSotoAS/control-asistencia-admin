@@ -58,7 +58,8 @@ export function AgendarFechasModal({
     try {
       const payload: AgendarFechasHitoPayload = {
         fechas: validFechas,
-        hito_id: hito?.id,
+        persona_id: hito?.persona_id || hito?.persona?.id,
+        ...(hito?.id ? { hito_id: hito.id } : {}),
       };
 
       await onAgendar(payload);
