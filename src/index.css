@@ -36,4 +36,10 @@ body,
   background: #bab7ac;
 }
 
+/* Ocultar el icono nativo de Edge/IE para mostrar contraseñas */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none !important;
+}
+
 @import "./styles/tokens.css";

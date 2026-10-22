@@ -48,6 +48,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className={cn(
               "w-full rounded-field border border-linea bg-white px-4 py-2.5 text-sm text-carbon placeholder:text-carbon/40 transition-all duration-200 outline-none",
               "focus:border-guinda focus:ring-2 focus:ring-guinda/15",
+              "[&::-ms-reveal]:hidden [&::-ms-clear]:hidden",
               leftIcon && "pl-10",
               rightIcon && "pr-10",
               error && "border-red-500 focus:border-red-500 focus:ring-red-500/15",
