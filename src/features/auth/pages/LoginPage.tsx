@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { Shield, Lock, User, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { Button, Input } from "@/components/ui";
@@ -18,6 +18,14 @@ export function LoginPage() {
   const location = useLocation();
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/";
+
+  useEffect(() => {
+    const expiredMsg = sessionStorage.getItem("session_expired_msg");
+    if (expiredMsg) {
+      setErrorMessage(expiredMsg);
+      sessionStorage.removeItem("session_expired_msg");
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
