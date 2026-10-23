@@ -99,7 +99,7 @@ export function UsuariosPage() {
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {/* Input de búsqueda real por identificador, nombre o DNI */}
-          <div className="relative min-w-[260px]">
+          <div className="relative w-full sm:w-auto sm:min-w-[260px]">
             <Search className="w-4 h-4 text-olivo/70 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"

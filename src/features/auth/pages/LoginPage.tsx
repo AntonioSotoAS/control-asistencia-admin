@@ -94,7 +94,7 @@ export function LoginPage() {
     <div className="min-h-screen bg-suave flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-md">
         {/* Card */}
-        <div className="bg-white rounded-card border border-linea shadow-lg p-8 sm:p-10">
+        <div className="bg-white rounded-card border border-linea shadow-lg p-6 sm:p-10">
           {/* Logo & Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-card bg-guinda text-white shadow-md mb-4">

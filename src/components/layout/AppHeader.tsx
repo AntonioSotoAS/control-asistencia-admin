@@ -185,19 +185,19 @@ export function AppHeader({ onToggleSidebar }: AppHeaderProps) {
   }).format(new Date());
 
   return (
-    <header className="h-20 bg-white/95 backdrop-blur-sm border-b border-linea/80 px-6 flex items-center justify-between sticky top-0 z-30">
-      <div className="flex items-center gap-4">
+    <header className="h-20 bg-white/95 backdrop-blur-sm border-b border-linea/80 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30">
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
         <button
           type="button"
           onClick={onToggleSidebar}
-          className="p-2 rounded-field text-carbon hover:bg-suave lg:hidden"
+          className="p-2 rounded-field text-carbon hover:bg-suave lg:hidden shrink-0"
           aria-label="Abrir menú"
         >
           <Menu className="w-5 h-5" />
         </button>
 
-        <div>
-          <h1 className="text-xl font-extrabold text-carbon tracking-tight leading-tight">
+        <div className="min-w-0">
+          <h1 className="text-base sm:text-xl font-extrabold text-carbon tracking-tight leading-tight truncate">
             {currentRoute.title}
           </h1>
           <p className="text-xs text-olivo hidden sm:block">
