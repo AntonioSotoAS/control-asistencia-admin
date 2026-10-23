@@ -3,7 +3,7 @@
    Autor: Antonio Soto
    ========================================================================== */
 
-const CACHE_NAME = 'control-asistencia-cache-v1';
+const CACHE_NAME = 'control-asistencia-cache-v2';
 
 // Recursos esenciales para la concha de la aplicación (App Shell)
 const STATIC_ASSETS = [
@@ -48,23 +48,13 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // 1. Peticiones a la API REST: Network-First (datos judiciales siempre frescos)
-  if (url.pathname.startsWith('/api') || url.hostname.includes('127.0.0.1') || url.port === '9000') {
-    event.respondWith(
-      fetch(request).catch(() => {
-        return new Response(
-          JSON.stringify({
-            success: false,
-            message: 'Sin conexión con el servidor judicial. Verifica tu conexión de red.',
-            offline: true,
-          }),
-          {
-            status: 503,
-            headers: { 'Content-Type': 'application/json' },
-          }
-        );
-      })
-    );
+  // 1. Peticiones a la API REST (locales o remotas): No interceptar en SW para que el navegador las envíe directamente
+  if (
+    url.pathname.startsWith('/api') ||
+    url.hostname.includes('cortedelsanta.com') ||
+    url.hostname.includes('127.0.0.1') ||
+    url.port === '9000'
+  ) {
     return;
   }
 

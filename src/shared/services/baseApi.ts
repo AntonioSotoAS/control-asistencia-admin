@@ -8,7 +8,8 @@ import {
 import { logout } from "@/features/auth/services/authSlice";
 
 const apiBase =
-  (import.meta.env.VITE_API_URL as string)?.replace(/\/+$/, "") || "/api";
+  (import.meta.env.VITE_API_URL as string)?.replace(/\/+$/, "") ||
+  "https://sitrad.cortedelsanta.com/api";
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: apiBase,
