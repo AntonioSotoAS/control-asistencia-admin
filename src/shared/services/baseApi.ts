@@ -7,8 +7,11 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { logout } from "@/features/auth/services/authSlice";
 
+const apiBase =
+  (import.meta.env.VITE_API_URL as string)?.replace(/\/+$/, "") || "/api";
+
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl: "/api",
+  baseUrl: apiBase,
   prepareHeaders: (headers) => {
     headers.set("Accept", "application/json");
     const token = sessionStorage.getItem("token");
