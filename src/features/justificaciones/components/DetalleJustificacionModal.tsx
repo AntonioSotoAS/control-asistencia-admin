@@ -22,8 +22,18 @@ export function DetalleJustificacionModal({
 }: DetalleJustificacionModalProps) {
   if (!justificacion) return null;
 
-  const isApproved = justificacion.estado === "APROBADA";
-  const isRejected = justificacion.estado === "RECHAZADA";
+  const estadoUpper = (justificacion.estado || "ENVIADA").toUpperCase();
+  const isApproved = estadoUpper === "APROBADA" || estadoUpper === "ACEPTADA";
+  const isRejected = estadoUpper === "RECHAZADA" || estadoUpper === "RECHAZADO";
+  const isEnRevision = estadoUpper.includes("REVISION") || estadoUpper.includes("REVISIÓN");
+
+  const badgeVariant = isApproved
+    ? "success"
+    : isRejected
+    ? "danger"
+    : isEnRevision
+    ? "info"
+    : "warning";
 
   const fileUrl = justificacion.sustentoDocUrl || justificacion.archivo_url || justificacion.archivo;
 
@@ -54,16 +64,8 @@ export function DetalleJustificacionModal({
               </span>
             </div>
 
-            <Badge
-              variant={
-                isApproved
-                  ? "success"
-                  : isRejected
-                  ? "danger"
-                  : "warning"
-              }
-            >
-              {justificacion.estado || "PENDIENTE"}
+            <Badge variant={badgeVariant}>
+              {justificacion.estado || "ENVIADA"}
             </Badge>
           </div>
 

@@ -16,7 +16,7 @@ import type {
 
 export function JustificacionesPage() {
   const [filterStatus, setFilterStatus] = useState<
-    "TODOS" | "PENDIENTE" | "APROBADA" | "RECHAZADA"
+    "TODOS" | "ENVIADA" | "PENDIENTE" | "EN_REVISION" | "APROBADA" | "OBSERVADA" | "RECHAZADA"
   >("TODOS");
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 300);
@@ -51,14 +51,35 @@ export function JustificacionesPage() {
     return justificaciones.filter((item) => {
       // Filtro por pestaña de estado
       if (filterStatus !== "TODOS") {
-        const itemEstado = (item.estado || "PENDIENTE").toUpperCase();
-        if (filterStatus === "PENDIENTE" && itemEstado !== "PENDIENTE") {
+        const itemEstado = (item.estado || "ENVIADA").toUpperCase();
+        if (
+          filterStatus === "ENVIADA" &&
+          itemEstado !== "ENVIADA" &&
+          itemEstado !== "PENDIENTE"
+        ) {
+          return false;
+        }
+        if (
+          filterStatus === "EN_REVISION" &&
+          !itemEstado.includes("REVISION") &&
+          !itemEstado.includes("REVISIÓN")
+        ) {
           return false;
         }
         if (
           filterStatus === "APROBADA" &&
           itemEstado !== "APROBADA" &&
-          itemEstado !== "APROBADO"
+          itemEstado !== "APROBADO" &&
+          itemEstado !== "ACEPTADA" &&
+          itemEstado !== "ACEPTADO"
+        ) {
+          return false;
+        }
+        if (
+          filterStatus === "OBSERVADA" &&
+          itemEstado !== "OBSERVADA" &&
+          itemEstado !== "OBSERVADO" &&
+          itemEstado !== "INCOMPLETA"
         ) {
           return false;
         }
@@ -99,9 +120,10 @@ export function JustificacionesPage() {
   }, [justificaciones, filterStatus, debouncedSearch]);
 
   const pendingCount = useMemo(() => {
-    return justificaciones.filter(
-      (i) => (i.estado || "PENDIENTE").toUpperCase() === "PENDIENTE"
-    ).length;
+    return justificaciones.filter((i) => {
+      const e = (i.estado || "ENVIADA").toUpperCase();
+      return e === "PENDIENTE" || e === "ENVIADA";
+    }).length;
   }, [justificaciones]);
 
   const handleSaveJustificacion = async (payload: RegistrarJustificacionPayload) => {
@@ -172,8 +194,10 @@ export function JustificacionesPage() {
         {(
           [
             { id: "TODOS", label: "Todas" },
-            { id: "PENDIENTE", label: `Pendientes (${pendingCount})` },
+            { id: "ENVIADA", label: `Enviadas (${pendingCount})` },
+            { id: "EN_REVISION", label: "En Revisión" },
             { id: "APROBADA", label: "Aprobadas" },
+            { id: "OBSERVADA", label: "Observadas" },
             { id: "RECHAZADA", label: "Rechazadas" },
           ] as const
         ).map((tab) => (
@@ -181,11 +205,10 @@ export function JustificacionesPage() {
             key={tab.id}
             type="button"
             onClick={() => setFilterStatus(tab.id)}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
-              filterStatus === tab.id
-                ? "bg-guinda text-white shadow-xs"
-                : "bg-white text-olivo hover:text-carbon border border-linea/80"
-            }`}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${filterStatus === tab.id
+              ? "bg-guinda text-white shadow-xs"
+              : "bg-white text-olivo hover:text-carbon border border-linea/80"
+              }`}
           >
             {tab.label}
           </button>

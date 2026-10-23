@@ -8,6 +8,7 @@ export interface UserProfile {
   dni?: string;
   expediente?: string | null;
   activo?: boolean;
+  pantallas?: string[];
 }
 
 export interface LoginRequest {
@@ -23,7 +24,10 @@ export interface LoginResponse {
     token: string;
     usuario?: UserProfile;
     user?: UserProfile;
+    pantallas?: string[];
+    [key: string]: unknown;
   };
+  pantallas?: string[];
   mensaje?: string;
   message?: string;
 }
@@ -37,11 +41,13 @@ export interface PerfilPersona {
   expediente?: string | null;
   juzgado?: string | null;
   seguimiento?: string | null;
+  pantallas?: string[];
   usuario?: {
     id: number;
     identificador: string;
     rol: string;
     estado: string;
+    pantallas?: string[];
   };
   consentimiento?: boolean;
 }

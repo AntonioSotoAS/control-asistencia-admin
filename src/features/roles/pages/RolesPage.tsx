@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { RolesTable } from "../components/RolesTable";
 import { RolModal } from "../components/RolModal";
 import { EliminarRolModal } from "../components/EliminarRolModal";
+import { AsignarPantallasModal } from "@/features/pantallas";
 import { Button } from "@/components/ui";
 import { Plus, Search, RefreshCw, CheckCircle2 } from "lucide-react";
 import { useDebounce } from "@/shared/hooks/useDebounce";
@@ -24,6 +25,7 @@ export function RolesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRol, setEditingRol] = useState<Rol | null>(null);
   const [deletingRol, setDeletingRol] = useState<Rol | null>(null);
+  const [selectedRolForPermisos, setSelectedRolForPermisos] = useState<Rol | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
 
   // Consulta directa a la API GET /api/roles
@@ -152,6 +154,7 @@ export function RolesPage() {
         error={error}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onAssignPantallas={(rol) => setSelectedRolForPermisos(rol)}
         onRetry={() => refetch()}
       />
 
@@ -172,6 +175,16 @@ export function RolesPage() {
         rol={deletingRol}
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
+      />
+
+      {/* Modal Asignación de Pantallas y Permisos */}
+      <AsignarPantallasModal
+        isOpen={Boolean(selectedRolForPermisos)}
+        onClose={() => setSelectedRolForPermisos(null)}
+        rol={selectedRolForPermisos}
+        onSuccess={() => {
+          showNotification("Permisos de pantallas actualizados para el rol seleccionado.");
+        }}
       />
     </div>
   );

@@ -8,7 +8,7 @@ import {
   Badge,
   Button,
 } from "@/components/ui";
-import { Edit2, Trash2, Shield, AlertCircle, Loader2, KeyRound } from "lucide-react";
+import { Edit2, Trash2, Shield, AlertCircle, Loader2, KeyRound, Layers } from "lucide-react";
 import { esRolProtegido, type Rol } from "../types/rol.types";
 
 interface RolesTableProps {
@@ -18,6 +18,7 @@ interface RolesTableProps {
   error?: unknown;
   onEdit: (rol: Rol) => void;
   onDelete: (rol: Rol) => void;
+  onAssignPantallas?: (rol: Rol) => void;
   onRetry?: () => void;
 }
 
@@ -28,6 +29,7 @@ export function RolesTable({
   error,
   onEdit,
   onDelete,
+  onAssignPantallas,
   onRetry,
 }: RolesTableProps) {
   if (isLoading) {
@@ -141,6 +143,16 @@ export function RolesTable({
 
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onAssignPantallas?.(r)}
+                    className="p-1.5 h-8 w-8 text-olivo hover:text-guinda"
+                    title="Configurar permisos de pantallas"
+                  >
+                    <Layers className="w-3.5 h-3.5" />
+                  </Button>
+
                   <Button
                     variant="ghost"
                     size="sm"

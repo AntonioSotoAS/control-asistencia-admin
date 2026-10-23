@@ -5,6 +5,7 @@ import { Button, Input } from "@/components/ui";
 import { useLoginMutation } from "../services/authApi";
 import { useAppDispatch } from "@/app/hooks";
 import { setCredentials } from "../services/authSlice";
+import type { UserProfile } from "../types/auth.types";
 
 export function LoginPage() {
   const [identificador, setIdentificador] = useState("");
@@ -44,20 +45,33 @@ export function LoginPage() {
 
       const token = response.token || response.data?.token;
       if (token) {
-        const usuarioData =
+        const rawUserData =
           response.usuario ||
           response.data?.usuario ||
           response.user ||
-          response.data?.user;
+          response.data?.user ||
+          (response.data && typeof response.data === "object" && "identificador" in response.data
+            ? (response.data as unknown as UserProfile)
+            : undefined);
+
+        const pantallas =
+          rawUserData?.pantallas ||
+          response.pantallas ||
+          (Array.isArray(response.data?.pantallas) ? (response.data?.pantallas as string[]) : undefined);
+
+        const usuarioFinal: UserProfile = {
+          ...(rawUserData || {
+            identificador,
+            nombre: "Usuario del Sistema",
+            rol: "admin",
+          }),
+          ...(pantallas ? { pantallas } : {}),
+        };
 
         dispatch(
           setCredentials({
             token,
-            user: usuarioData || {
-              identificador,
-              nombre: "Usuario del Sistema",
-              rol: "admin",
-            },
+            user: usuarioFinal,
           })
         );
         navigate(from, { replace: true });
@@ -86,6 +100,18 @@ export function LoginPage() {
           nombre: "Administrador General",
           rol: "admin",
           correo: "admin@institucion.gob.pe",
+          pantallas: [
+            "dashboard",
+            "beneficiarios",
+            "hitos",
+            "asistencias",
+            "justificaciones",
+            "reportes",
+            "usuarios",
+            "personas",
+            "roles",
+            "pantallas",
+          ],
         },
       })
     );

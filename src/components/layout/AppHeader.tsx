@@ -9,7 +9,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Badge } from "@/components/ui";
-import { useAppSelector } from "@/app/hooks";
+import { useAppSelector, useAppDispatch } from "@/app/hooks";
+import { setUser } from "@/features/auth/services/authSlice";
 import {
   useCheckHealthQuery,
   useGetPerfilQuery,
@@ -56,6 +57,10 @@ const routeTitles: Record<string, { title: string; subtitle: string }> = {
   "/roles": {
     title: "Catálogo de Roles y Permisos",
     subtitle: "Administración de perfiles de acceso para usuarios",
+  },
+  "/pantallas": {
+    title: "Catálogo de Pantallas y Permisos por Rol",
+    subtitle: "Gestión de módulos visibles y control de acceso por rol",
   },
 };
 
@@ -137,9 +142,32 @@ export function AppHeader({ onToggleSidebar }: AppHeaderProps) {
     }
   );
 
+  const dispatch = useAppDispatch();
   const { data: perfilData } = useGetPerfilQuery(undefined, {
     skip: !authUser,
   });
+
+  // Sincronizar automáticamente las pantallas permitidas del perfil del usuario
+  useEffect(() => {
+    if (perfilData && authUser) {
+      const pantallasFromPerfil =
+        perfilData.pantallas ||
+        perfilData.usuario?.pantallas;
+
+      if (
+        pantallasFromPerfil &&
+        Array.isArray(pantallasFromPerfil) &&
+        (!authUser.pantallas || authUser.pantallas.length !== pantallasFromPerfil.length)
+      ) {
+        dispatch(
+          setUser({
+            ...authUser,
+            pantallas: pantallasFromPerfil,
+          })
+        );
+      }
+    }
+  }, [perfilData, authUser, dispatch]);
 
   const isApiOnline =
     !isHealthError &&

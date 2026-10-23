@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { NavLink, useNavigate } from "react-router";
 import {
   LayoutDashboard,
@@ -10,6 +10,7 @@ import {
   UserCog,
   UserCheck,
   ShieldCheck,
+  SlidersHorizontal,
   LogOut,
   X,
   Shield,
@@ -46,12 +47,37 @@ const navItems: NavItem[] = [
   { name: "Usuarios", to: "/usuarios", icon: UserCog },
   { name: "Personas", to: "/personas", icon: UserCheck },
   { name: "Roles", to: "/roles", icon: ShieldCheck },
+  { name: "Pantallas", to: "/pantallas", icon: SlidersHorizontal },
 ];
 
 export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const authUser = useAppSelector((state) => state.auth.user);
+
+  const pantallasPermitidas = authUser?.pantallas;
+  const rol = authUser?.rol?.toLowerCase();
+  const isSuperAdmin = rol === "superadmin" || rol === "admin";
+
+  // Filtrado reactivo de ítems de menú según permisos de pantalla
+  const itemsVisibles = useMemo(() => {
+    return navItems.filter((item) => {
+      // Normalizar la ruta a código de pantalla (ej: "/" -> "dashboard", "/beneficiarios" -> "beneficiarios")
+      const codigo = item.to === "/" ? "dashboard" : item.to.replace(/^\//, "");
+
+      if (pantallasPermitidas && Array.isArray(pantallasPermitidas) && pantallasPermitidas.length > 0) {
+        return pantallasPermitidas.includes(codigo);
+      }
+
+      // Si aún no se cargó el array en la sesión actual, admin/superadmin ve todos los módulos
+      if (isSuperAdmin) {
+        return true;
+      }
+
+      // Módulos base por defecto para otros roles mientras se sincroniza
+      return ["dashboard", "beneficiarios", "hitos", "asistencias", "justificaciones"].includes(codigo);
+    });
+  }, [pantallasPermitidas, isSuperAdmin]);
 
   const { data: justificaciones } = useGetJustificacionesQuery(undefined, {
     skip: !authUser,
@@ -121,7 +147,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
           <div className="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-olivo/70">
             Módulos Principales
           </div>
-          {navItems.map((item) => {
+          {itemsVisibles.map((item) => {
             const Icon = item.icon;
             return (
               <NavLink
