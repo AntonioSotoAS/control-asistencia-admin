@@ -116,21 +116,25 @@ export const hitosApi = baseApi.injectEndpoints({
     // GET /api/admin/hitos (Lista los hitos de todos los usuarios)
     getHitosAdmin: builder.query<HitoAdmin[], ListarHitosAdminParams | void>({
       query: (params) => {
+        if (!params) {
+          return { url: "/admin/hitos" };
+        }
+
         const queryParams: Record<string, string | number | boolean> = {};
 
-        if (params?.q && params.q.trim()) {
+        if (params.q?.trim()) {
           queryParams.q = params.q.trim();
         }
-        if (params?.revision) {
+        if (params.revision) {
           queryParams.revision = params.revision;
         }
-        if (params?.estado) {
+        if (params.estado) {
           queryParams.estado = params.estado;
         }
-        if (params?.persona_id !== undefined && params.persona_id !== null) {
+        if (params.persona_id !== undefined && params.persona_id !== null) {
           queryParams.persona_id = params.persona_id;
         }
-        if (params?.incluir_sin_hito !== undefined) {
+        if (params.incluir_sin_hito !== undefined) {
           queryParams.incluir_sin_hito = params.incluir_sin_hito;
         }
 
