@@ -37,7 +37,7 @@ export function HitosPage() {
     "pendiente" | "valida" | "observada" | ""
   >("");
   const [estadoFilter, setEstadoFilter] = useState<"activo" | "cerrado" | "">("");
-  const [incluirSinHito, setIncluirSinHito] = useState(true);
+  const [incluirSinHito, setIncluirSinHito] = useState(false);
 
   // Estados de modales
   const [selectedHitoDetailId, setSelectedHitoDetailId] = useState<number | null>(
