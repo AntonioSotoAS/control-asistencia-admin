@@ -7,6 +7,7 @@ import {
   Radio,
   X,
   ArrowRight,
+  Download,
 } from "lucide-react";
 import { Badge } from "@/components/ui";
 import { useAppSelector, useAppDispatch } from "@/app/hooks";
@@ -16,6 +17,7 @@ import {
   useGetPerfilQuery,
 } from "@/features/auth/services/authApi";
 import { useGetBeneficiariosQuery } from "@/features/beneficiarios/services/beneficiariosApi";
+import { usePWAInstall } from "@/shared/pwa";
 
 interface AppHeaderProps {
   onToggleSidebar: () => void;
@@ -78,6 +80,7 @@ export function AppHeader({ onToggleSidebar }: AppHeaderProps) {
     subtitle: "Sistema Institucional",
   };
   const authUser = useAppSelector((state) => state.auth.user);
+  const { isInstallable, promptInstall } = usePWAInstall();
 
   // Debounce search query
   useEffect(() => {
@@ -313,6 +316,19 @@ export function AppHeader({ onToggleSidebar }: AppHeaderProps) {
             </div>
           )}
         </div>
+
+        {/* Botón Instalar PWA */}
+        {isInstallable && (
+          <button
+            type="button"
+            onClick={promptInstall}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-guinda text-white text-xs font-bold hover:bg-guinda/90 shadow-sm transition animate-in fade-in"
+            title="Instalar Sistema de Asistencias en tu dispositivo"
+          >
+            <Download className="w-3.5 h-3.5 text-white" />
+            <span className="hidden md:inline">Instalar App</span>
+          </button>
+        )}
 
         {/* Real API connection indicator */}
         <div

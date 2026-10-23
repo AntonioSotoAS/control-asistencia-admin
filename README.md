@@ -39,6 +39,7 @@ Ofrece una interfaz ágil, reactiva y elegante para personal judicial, administr
 - 📅 **Gestión de Asistencias y Auditoría:** Trazabilidad completa de sesiones registradas vía QR/móvil, marcas horarias y verificación de identidad.
 - 📋 **Flujo de Justificaciones con Debido Proceso:** Bandeja de resolución con estados de ciclo de vida (`ENVIADA` ➔ `EN REVISIÓN` ➔ `APROBADA` / `OBSERVADA` / `RECHAZADA`), visualizador de comprobantes médicos/laborales y registro de auditoría.
 - 🛡️ **Seguridad Granular (RBAC + Pantallas Dinámicas):** Asignación interactiva de vistas y módulos visibles mediante la matriz `rol_pantalla`, sincronizada reactivamente con el menú lateral en tiempo real.
+- 📱 **Soporte PWA (Progressive Web App):** Instalable como aplicación nativa en Windows, macOS, Android e iOS, con Service Worker, caché de interfaz (App Shell), modo standalone y accesos directos.
 - 📈 **Reportes y Exportación:** Generación de resúmenes consolidados para emisión de informes a juzgados y despachos fiscales.
 
 ---

@@ -5,8 +5,12 @@ import { BrowserRouter } from "react-router";
 
 import { store } from "./app/store";
 import App from "./App";
+import { registerServiceWorker } from "./shared/pwa";
 import "@fontsource-variable/nunito";
 import "./index.css";
+
+// Iniciar soporte de PWA y Service Worker
+registerServiceWorker();
 
 ReactDOM.createRoot(
   document.getElementById("root")!
