@@ -2,6 +2,7 @@ import { baseApi } from "@/shared/services/baseApi";
 import type {
   SesionAsistencia,
   RegistrarSesionPayload,
+  ListarSesionesParams,
 } from "../types/asistencia.types";
 
 function normalizeSesion(item: Partial<SesionAsistencia> & Record<string, unknown>): SesionAsistencia {
@@ -23,10 +24,12 @@ function normalizeSesion(item: Partial<SesionAsistencia> & Record<string, unknow
 
   const hitoNombre =
     (item.hitoNombre as string) ||
+    (hito.titulo as string) ||
     (hito.nombre as string) ||
     (item.hito_id ? `Hito #${item.hito_id}` : "Sesión de Control");
 
-  const rawEstado = (item.estado as string) || "PRESENTE";
+  const asistio = Boolean(item.asistio);
+  const rawEstado = (item.estado as string) || (asistio ? "PRESENTE" : "PENDIENTE");
   const estado = rawEstado.toUpperCase();
 
   const rawMetodo = (item.metodo as string) || "QR";
@@ -39,11 +42,18 @@ function normalizeSesion(item: Partial<SesionAsistencia> & Record<string, unknow
     id: Number(item.id),
     persona_id: item.persona_id ? Number(item.persona_id) : undefined,
     hito_id: item.hito_id ? Number(item.hito_id) : undefined,
+    numero: item.numero ? Number(item.numero) : undefined,
     fecha: (item.fecha as string) || (typeof item.created_at === "string" ? item.created_at.split("T")[0] : "—"),
     hora,
+    tipo: (item.tipo as string) || "presencial",
+    asistio,
+    programada: Boolean(item.programada),
+    comprobante: (item.comprobante as string) || null,
+    comprobante_url: (item.comprobante_url as string) || null,
+    notas: (item.notas as string) || null,
     estado,
     metodo,
-    observacion: (item.observacion as string) || null,
+    observacion: (item.observacion as string) || (item.notas as string) || null,
     created_at: (item.created_at as string) || undefined,
     updated_at: (item.updated_at as string) || undefined,
     persona: item.persona as SesionAsistencia["persona"],
@@ -56,8 +66,27 @@ function normalizeSesion(item: Partial<SesionAsistencia> & Record<string, unknow
 
 export const asistenciasApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getSesiones: builder.query<SesionAsistencia[], void>({
-      query: () => "/sesiones",
+    getSesiones: builder.query<SesionAsistencia[], ListarSesionesParams | void>({
+      query: (params) => {
+        if (!params) {
+          return "/sesiones";
+        }
+        const queryParams: Record<string, string | number> = {};
+        if (params.persona_id) {
+          queryParams.persona_id = params.persona_id;
+        }
+        if (params.hito_id) {
+          queryParams.hito_id = params.hito_id;
+        }
+        if (params.q?.trim()) {
+          queryParams.q = params.q.trim();
+        }
+
+        return {
+          url: "/sesiones",
+          params: Object.keys(queryParams).length > 0 ? queryParams : undefined,
+        };
+      },
       transformResponse: (response: unknown): SesionAsistencia[] => {
         let rawList: (Partial<SesionAsistencia> & Record<string, unknown>)[] = [];
 

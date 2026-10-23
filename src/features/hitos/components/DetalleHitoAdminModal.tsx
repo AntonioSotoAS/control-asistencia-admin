@@ -68,23 +68,6 @@ export function DetalleHitoAdminModal({
     }
   };
 
-  const getSesionBadge = (estado?: string | null) => {
-    const st = (estado || "pendiente").toLowerCase();
-    if (st.includes("presente") || st.includes("asistio")) {
-      return <Badge variant="success">Presente</Badge>;
-    }
-    if (st.includes("tardanza")) {
-      return <Badge variant="warning">Tardanza</Badge>;
-    }
-    if (st.includes("falta") || st.includes("ausente")) {
-      return <Badge variant="danger">Falta</Badge>;
-    }
-    if (st.includes("justificad")) {
-      return <Badge variant="olivo">Justificado</Badge>;
-    }
-    return <Badge variant="default">Programada</Badge>;
-  };
-
   return (
     <Modal
       isOpen={isOpen}
@@ -247,27 +230,56 @@ export function DetalleHitoAdminModal({
                   >
                     <div className="flex items-center gap-3">
                       <span className="w-6 h-6 rounded-full bg-suave flex items-center justify-center font-mono font-bold text-olivo text-[11px]">
-                        #{idx + 1}
+                        #{s.numero ?? idx + 1}
                       </span>
                       <div>
-                        <span className="font-bold text-carbon block">
-                          {s.fecha}
-                        </span>
-                        {s.hora && (
-                          <span className="text-[11px] text-olivo font-mono">
-                            Hora: {s.hora}
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-carbon">
+                            {s.fecha}
                           </span>
+                          {s.tipo && (
+                            <span className="text-[10px] uppercase font-bold text-olivo bg-suave/80 px-1.5 py-0.5 rounded border border-linea/60">
+                              {s.tipo}
+                            </span>
+                          )}
+                        </div>
+                        {s.notas && (
+                          <span className="text-[11px] text-olivo block italic">
+                            Nota: {s.notas}
+                          </span>
+                        )}
+                        {s.comprobante && (
+                          <div className="mt-0.5">
+                            {s.comprobante_url ? (
+                              <a
+                                href={s.comprobante_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[11px] font-bold text-guinda hover:underline inline-flex items-center gap-1"
+                              >
+                                📎 Comprobante: {s.comprobante}
+                              </a>
+                            ) : (
+                              <span className="text-[11px] text-olivo font-mono">
+                                📎 {s.comprobante}
+                              </span>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
-                      {s.observacion && (
-                        <span className="text-[11px] text-olivo italic truncate max-w-[150px]">
-                          {s.observacion}
-                        </span>
+                      {s.asistio ? (
+                        <Badge variant="success" className="gap-1 font-bold">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          Asistió
+                        </Badge>
+                      ) : (
+                        <Badge variant="default" className="text-olivo font-medium">
+                          Programada
+                        </Badge>
                       )}
-                      {getSesionBadge(s.estado)}
                     </div>
                   </div>
                 ))}

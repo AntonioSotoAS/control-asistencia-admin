@@ -1,6 +1,7 @@
 import { baseApi } from "@/shared/services/baseApi";
 import type {
   HitoAdmin,
+  SesionHitoAdmin,
   ListarHitosAdminParams,
   AgendarFechasHitoPayload,
   RevisarFechasHitoPayload,
@@ -8,12 +9,29 @@ import type {
 
 function normalizeAdminHito(item: Partial<HitoAdmin> & Record<string, unknown>): HitoAdmin {
   const persona = (item.persona || {}) as Record<string, unknown>;
-  const sesiones = (item.sesiones as HitoAdmin["sesiones"]) || [];
+  const rawSesiones = (item.sesiones as (Partial<SesionHitoAdmin> & Record<string, unknown>)[]) || [];
+
+  const sesiones: SesionHitoAdmin[] = rawSesiones.map((s) => ({
+    id: Number(s.id),
+    numero: s.numero ? Number(s.numero) : undefined,
+    hito_id: s.hito_id ? Number(s.hito_id) : undefined,
+    persona_id: s.persona_id ? Number(s.persona_id) : undefined,
+    fecha: (s.fecha as string) || "",
+    hora: (s.hora as string) || null,
+    tipo: (s.tipo as string) || "presencial",
+    asistio: Boolean(s.asistio),
+    programada: Boolean(s.programada),
+    comprobante: (s.comprobante as string) || null,
+    comprobante_url: (s.comprobante_url as string) || null,
+    notas: (s.notas as string) || null,
+    estado: (s.estado as string) || (s.asistio ? "asistio" : "pendiente"),
+    observacion: (s.observacion as string) || (s.notas as string) || null,
+  }));
 
   const fechas: string[] =
     (item.fechas as string[]) ||
     (item.fechas_sesiones as string[]) ||
-    sesiones.map((s) => s.fecha) ||
+    sesiones.map((s) => s.fecha).filter(Boolean) ||
     [];
 
   const sesionesTotales =
@@ -27,19 +45,19 @@ function normalizeAdminHito(item: Partial<HitoAdmin> & Record<string, unknown>):
   const sesionesCompletadas =
     Number(item.sesiones_completadas) ||
     Number(item.asistencias_count) ||
+    Number(item.asistencias) ||
     Number(item.sesiones_asistidas) ||
     Number(item.totalAsistieron) ||
-    sesiones.filter((s) => {
-      const st = (s.estado || "").toLowerCase();
-      return st === "presente" || st === "asistio" || st === "justificado";
-    }).length;
+    sesiones.filter((s) => s.asistio || s.estado === "presente" || s.estado === "asistio").length;
 
   const porcentajeAvance =
     typeof item.porcentaje_avance === "number"
       ? item.porcentaje_avance
-      : sesionesTotales > 0
-        ? Math.min(100, Math.round((sesionesCompletadas / sesionesTotales) * 100))
-        : 0;
+      : typeof item.progreso === "number"
+        ? Math.round(Number(item.progreso) * 100)
+        : sesionesTotales > 0
+          ? Math.min(100, Math.round((sesionesCompletadas / sesionesTotales) * 100))
+          : 0;
 
   const tieneHito =
     typeof item.tiene_hito === "boolean"

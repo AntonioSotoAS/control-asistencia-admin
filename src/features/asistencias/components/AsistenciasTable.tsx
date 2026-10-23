@@ -7,7 +7,7 @@ import {
   TableCell,
   Badge,
 } from "@/components/ui";
-import { QrCode, ScanFace, FileEdit, CalendarCheck } from "lucide-react";
+import { CalendarCheck } from "lucide-react";
 import type { Asistencia } from "../types/asistencia.types";
 
 interface AsistenciasTableProps {
@@ -41,86 +41,117 @@ export function AsistenciasTable({
     );
   }
 
-  const getMethodIcon = (metodo: Asistencia["metodo"]) => {
-    switch (metodo) {
-      case "QR":
-        return <QrCode className="w-3.5 h-3.5 text-guinda" />;
-      case "BIOMETRICO":
-        return <ScanFace className="w-3.5 h-3.5 text-emerald-600" />;
-      default:
-        return <FileEdit className="w-3.5 h-3.5 text-olivo" />;
-    }
-  };
-
-  const getBadgeVariant = (estado: Asistencia["estado"]) => {
-    switch (estado) {
-      case "PRESENTE":
-        return "success";
-      case "TARDANZA":
-        return "warning";
-      case "JUSTIFICADO":
-        return "olivo";
-      case "FALTA":
-        return "danger";
-      default:
-        return "default";
-    }
-  };
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead className="w-16"># Sesión</TableHead>
           <TableHead>Beneficiario</TableHead>
-          <TableHead>DNI</TableHead>
-          <TableHead>Hito / Evento</TableHead>
-          <TableHead>Fecha y Hora</TableHead>
-          <TableHead>Método</TableHead>
-          <TableHead className="text-right">Estado</TableHead>
+          <TableHead>Hito de Control</TableHead>
+          <TableHead>Fecha y Tipo</TableHead>
+          <TableHead>Comprobante / Notas</TableHead>
+          <TableHead className="text-right">¿Asistió?</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {asistencias.map((item) => (
-          <TableRow key={item.id}>
-            <TableCell>
-              <span className="font-bold text-carbon block">
-                {item.beneficiarioNombre}
-              </span>
-              {item.observacion && (
-                <span className="text-[11px] text-olivo italic">
-                  Obs: {item.observacion}
+        {asistencias.map((item) => {
+          const asistio = item.asistio ?? (item.estado === "PRESENTE" || item.estado === "ASISTIO");
+
+          return (
+            <TableRow key={item.id} className="hover:bg-suave/40">
+              {/* # Sesión */}
+              <TableCell>
+                <span className="w-7 h-7 rounded-full bg-suave flex items-center justify-center font-mono font-bold text-xs text-carbon border border-linea/60">
+                  #{item.numero || item.id}
                 </span>
-              )}
-            </TableCell>
-            <TableCell>
-              <span className="font-mono font-semibold text-carbon bg-suave px-2 py-0.5 rounded-md text-xs">
-                {item.beneficiarioDni}
-              </span>
-            </TableCell>
-            <TableCell>
-              <span className="text-xs font-medium text-carbon">
-                {item.hitoNombre}
-              </span>
-            </TableCell>
-            <TableCell>
-              <div className="flex flex-col text-xs">
-                <span className="font-semibold text-carbon">{item.hora}</span>
-                <span className="text-[11px] text-olivo">{item.fecha}</span>
-              </div>
-            </TableCell>
-            <TableCell>
-              <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-suave/80 text-xs font-semibold">
-                {getMethodIcon(item.metodo)}
-                <span className="text-[11px]">{item.metodo}</span>
-              </div>
-            </TableCell>
-            <TableCell className="text-right">
-              <Badge variant={getBadgeVariant(item.estado)}>
-                {item.estado}
-              </Badge>
-            </TableCell>
-          </TableRow>
-        ))}
+              </TableCell>
+
+              {/* Beneficiario */}
+              <TableCell>
+                <div className="space-y-0.5">
+                  <span className="font-extrabold text-sm text-carbon block">
+                    {item.beneficiarioNombre}
+                  </span>
+                  <span className="font-mono text-[11px] font-semibold text-olivo bg-suave px-1.5 py-0.5 rounded border border-linea/60">
+                    DNI: {item.beneficiarioDni}
+                  </span>
+                </div>
+              </TableCell>
+
+              {/* Hito */}
+              <TableCell>
+                <span className="text-xs font-semibold text-carbon">
+                  {item.hitoNombre || `Hito #${item.hito_id || "—"}`}
+                </span>
+              </TableCell>
+
+              {/* Fecha y Tipo */}
+              <TableCell>
+                <div className="flex flex-col text-xs">
+                  <span className="font-bold text-carbon">{item.fecha}</span>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    {item.hora && item.hora !== "—" && (
+                      <span className="text-[11px] text-olivo">{item.hora}</span>
+                    )}
+                    {item.tipo && (
+                      <span className="text-[10px] uppercase font-bold text-olivo bg-suave/80 px-1 py-0.2 rounded border border-linea/60">
+                        {item.tipo}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </TableCell>
+
+              {/* Comprobante / Notas */}
+              <TableCell className="max-w-[220px]">
+                <div className="space-y-1 text-xs">
+                  {item.comprobante ? (
+                    <div>
+                      {item.comprobante_url ? (
+                        <a
+                          href={item.comprobante_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-bold text-guinda hover:underline inline-flex items-center gap-1 text-[11px]"
+                        >
+                          📎 {item.comprobante}
+                        </a>
+                      ) : (
+                        <span className="text-olivo font-mono text-[11px]">
+                          📎 {item.comprobante}
+                        </span>
+                      )}
+                    </div>
+                  ) : null}
+
+                  {item.notas || item.observacion ? (
+                    <span className="text-[11px] text-carbon/80 italic block truncate">
+                      "{item.notas || item.observacion}"
+                    </span>
+                  ) : null}
+
+                  {!item.comprobante && !item.notas && !item.observacion && (
+                    <span className="text-olivo/50 text-[11px]">—</span>
+                  )}
+                </div>
+              </TableCell>
+
+              {/* ¿Asistió? */}
+              <TableCell className="text-right">
+                {asistio ? (
+                  <Badge variant="success" className="gap-1 font-bold">
+                    ✓ Asistió
+                  </Badge>
+                ) : (
+                  <Badge variant="default" className="text-olivo font-medium">
+                    Programada
+                  </Badge>
+                )}
+              </TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );

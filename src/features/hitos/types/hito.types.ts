@@ -14,10 +14,17 @@ export interface BeneficiarioHitoInfo {
 
 export interface SesionHitoAdmin {
   id: number;
+  numero?: number;
   hito_id?: number;
   persona_id?: number;
   fecha: string;
   hora?: string | null;
+  tipo?: string;
+  asistio?: boolean;
+  programada?: boolean;
+  comprobante?: string | null;
+  comprobante_url?: string | null;
+  notas?: string | null;
   estado?: string | null; // presente, tardanza, falta, pendiente, etc.
   observacion?: string | null;
 }

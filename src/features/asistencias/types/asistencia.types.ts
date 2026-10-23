@@ -17,8 +17,15 @@ export interface SesionAsistencia {
   id: number;
   persona_id?: number;
   hito_id?: number;
+  numero?: number;
   fecha: string;
   hora?: string;
+  tipo?: "presencial" | "virtual" | string;
+  asistio?: boolean;
+  programada?: boolean;
+  comprobante?: string | null;
+  comprobante_url?: string | null;
+  notas?: string | null;
   estado?: EstadoAsistencia;
   metodo?: MetodoAsistencia;
   observacion?: string | null;
@@ -33,6 +40,12 @@ export interface SesionAsistencia {
   beneficiarioNombre?: string;
   beneficiarioDni?: string;
   hitoNombre?: string;
+}
+
+export interface ListarSesionesParams {
+  persona_id?: number;
+  hito_id?: number;
+  q?: string;
 }
 
 // Alias de retrocompatibilidad
