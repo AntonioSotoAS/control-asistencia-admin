@@ -17,7 +17,11 @@ export const authApi = baseApi.injectEndpoints({
       query: (body) => ({
         url: "/login",
         method: "POST",
-        body,
+        body: {
+          identificador: body.identificador,
+          password: body.password,
+          codigo: body.codigo || "CONTROLASISTENCIA-WEB",
+        },
       }),
       invalidatesTags: ["Usuario"],
     }),

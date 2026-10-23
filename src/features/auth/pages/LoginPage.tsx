@@ -41,6 +41,7 @@ export function LoginPage() {
       const response = await login({
         identificador: identificador.trim(),
         password,
+        codigo: "CONTROLASISTENCIA-WEB",
       }).unwrap();
 
       const token = response.token || response.data?.token;
@@ -58,6 +59,12 @@ export function LoginPage() {
           rawUserData?.pantallas ||
           response.pantallas ||
           (Array.isArray(response.data?.pantallas) ? (response.data?.pantallas as string[]) : undefined);
+
+        const rol = (rawUserData?.rol || "").toLowerCase().trim();
+        if (rol === "beneficiario") {
+          setErrorMessage("El beneficiario ingresa desde la aplicación.");
+          return;
+        }
 
         const usuarioFinal: UserProfile = {
           ...(rawUserData || {
@@ -79,10 +86,15 @@ export function LoginPage() {
         setErrorMessage("Respuesta inválida del servidor: token no recibido.");
       }
     } catch (err: unknown) {
-      const error = err as { data?: { mensaje?: string; message?: string }; error?: string };
+      const error = err as {
+        status?: number;
+        data?: { mensaje?: string; message?: string; error?: string };
+        error?: string;
+      };
       const message =
         error.data?.mensaje ||
         error.data?.message ||
+        error.data?.error ||
         error.error ||
         "Credenciales inválidas o servidor no disponible.";
       setErrorMessage(message);

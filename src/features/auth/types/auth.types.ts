@@ -14,6 +14,7 @@ export interface UserProfile {
 export interface LoginRequest {
   identificador: string;
   password: string;
+  codigo?: string;
 }
 
 export interface LoginResponse {
