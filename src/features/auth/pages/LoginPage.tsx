@@ -89,34 +89,6 @@ export function LoginPage() {
     }
   };
 
-  // Demo helper to allow quick login testing in dev
-  const handleQuickDemo = () => {
-    const demoToken = "demo-jwt-token-asistencia-2026";
-    dispatch(
-      setCredentials({
-        token: demoToken,
-        user: {
-          identificador: "admin",
-          nombre: "Administrador General",
-          rol: "admin",
-          correo: "admin@institucion.gob.pe",
-          pantallas: [
-            "dashboard",
-            "beneficiarios",
-            "hitos",
-            "asistencias",
-            "justificaciones",
-            "reportes",
-            "usuarios",
-            "personas",
-            "roles",
-            "pantallas",
-          ],
-        },
-      })
-    );
-    navigate(from, { replace: true });
-  };
 
   return (
     <div className="min-h-screen bg-suave flex items-center justify-center p-4 sm:p-6 lg:p-8">
@@ -193,19 +165,6 @@ export function LoginPage() {
             </Button>
           </form>
 
-          {/* Dev credentials demo button */}
-          <div className="mt-6 pt-6 border-t border-linea text-center">
-            <p className="text-xs text-olivo mb-2">¿Prueba rápida en desarrollo?</p>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleQuickDemo}
-              className="w-full text-xs font-semibold"
-            >
-              Acceso Rápido de Demostración
-            </Button>
-          </div>
         </div>
 
         {/* Footer info */}
