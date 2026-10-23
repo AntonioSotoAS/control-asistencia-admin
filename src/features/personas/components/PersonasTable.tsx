@@ -5,11 +5,11 @@ import {
   TableRow,
   TableHead,
   TableCell,
-  Badge,
   Button,
 } from "@/components/ui";
 import { Edit2, Trash2, Users, AlertCircle, Loader2, Phone, Mail, Scale } from "lucide-react";
 import type { Persona } from "../types/persona.types";
+import { getSeguimientoBadge } from "@/features/beneficiarios/components/BeneficiariosTable";
 
 interface PersonasTableProps {
   personas: Persona[];
@@ -169,17 +169,7 @@ export function PersonasTable({
 
             <TableCell>
               {p.seguimiento && p.seguimiento.trim() ? (
-                <Badge
-                  variant={
-                    p.seguimiento.toLowerCase().includes("finalizado")
-                      ? "olivo"
-                      : p.seguimiento.toLowerCase().includes("pendiente")
-                      ? "warning"
-                      : "success"
-                  }
-                >
-                  {p.seguimiento}
-                </Badge>
+                getSeguimientoBadge(p.seguimiento)
               ) : (
                 <span className="text-xs text-olivo/60 italic">—</span>
               )}

@@ -55,7 +55,7 @@ export function PersonaModal({
       setTelefono("");
       setExpediente("");
       setJuzgado("");
-      setSeguimiento("En seguimiento");
+      setSeguimiento("en_curso");
     }
   }, [personaToEdit, isOpen]);
 
@@ -244,10 +244,12 @@ export function PersonaModal({
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[
-              { label: "No aplica / Ninguno", value: "" },
-              { label: "En seguimiento", value: "En seguimiento" },
-              { label: "Pendiente", value: "Pendiente de inicio" },
-              { label: "Finalizado", value: "Finalizado" },
+              { label: "Sin estado", value: "" },
+              { label: "🔵 En curso", value: "en_curso" },
+              { label: "🟢 Cumple", value: "cumple" },
+              { label: "🟡 Alerta", value: "alerta" },
+              { label: "🔴 Incumplimiento", value: "incumplimiento" },
+              { label: "🟣 Culminado", value: "culminado" },
             ].map((opcion) => (
               <label
                 key={opcion.label}

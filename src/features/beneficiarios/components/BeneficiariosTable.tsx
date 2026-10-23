@@ -52,7 +52,7 @@ export function getSeguimientoBadge(seguimiento?: SeguimientoTipo | string | nul
       );
     case "culminado":
       return (
-        <Badge variant="info" className="text-[11px] font-bold">
+        <Badge variant="purple" className="text-[11px] font-bold">
           <CheckCircle2 className="w-3 h-3 mr-1 inline" />
           Culminado
         </Badge>

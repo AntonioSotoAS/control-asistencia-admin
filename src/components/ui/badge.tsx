@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "@/shared/utils/cn";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: "default" | "success" | "warning" | "danger" | "info" | "olivo" | "guinda";
+  variant?: "default" | "success" | "warning" | "danger" | "info" | "olivo" | "guinda" | "purple";
 }
 
 export function Badge({
@@ -19,6 +19,7 @@ export function Badge({
     info: "bg-sky-50 text-sky-800 border-sky-200",
     olivo: "bg-[#f4f3ed] text-olivo border-[#dedcd2]",
     guinda: "bg-[#fcf1f1] text-guinda border-[#f4cfcf]",
+    purple: "bg-purple-50 text-purple-800 border-purple-200",
   };
 
   return (

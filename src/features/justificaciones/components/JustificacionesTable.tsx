@@ -86,12 +86,23 @@ export function JustificacionesTable({
 
   const getBadgeVariant = (estado?: string) => {
     switch (estado?.toUpperCase()) {
+      case "ACEPTADA":
+      case "ACEPTADO":
       case "APROBADA":
       case "APROBADO":
         return "success";
+      case "EN_REVISION":
+      case "EN REVISIÓN":
+      case "EN REVISION":
+        return "info";
+      case "OBSERVADA":
+      case "OBSERVADO":
+      case "INCOMPLETA":
+        return "warning";
       case "RECHAZADA":
       case "RECHAZADO":
         return "danger";
+      case "ENVIADA":
       case "PENDIENTE":
       default:
         return "warning";

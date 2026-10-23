@@ -17,6 +17,16 @@ export interface SesionJustificacion {
   };
 }
 
+export type EstadoJustificacion =
+  | "ENVIADA"
+  | "PENDIENTE"
+  | "EN_REVISION"
+  | "ACEPTADA"
+  | "APROBADA"
+  | "OBSERVADA"
+  | "RECHAZADA"
+  | string;
+
 export interface Justificacion {
   id: number;
   persona_id?: number;
@@ -25,7 +35,7 @@ export interface Justificacion {
   motivo: string;
   archivo?: string | null;
   archivo_url?: string | null;
-  estado?: string;
+  estado?: EstadoJustificacion;
   observacion?: string | null;
   created_at?: string;
   updated_at?: string;
