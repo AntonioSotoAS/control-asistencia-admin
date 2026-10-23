@@ -20,6 +20,7 @@ import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { logout } from "@/features/auth/services/authSlice";
 import { useLogoutMutation } from "@/features/auth/services/authApi";
 import { useGetJustificacionesQuery } from "@/features/justificaciones";
+import { useGetMisPantallasQuery } from "@/features/pantallas/services/pantallasApi";
 
 interface AppSidebarProps {
   isOpen: boolean;
@@ -55,21 +56,37 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
   const navigate = useNavigate();
   const authUser = useAppSelector((state) => state.auth.user);
 
-  const pantallasPermitidas = authUser?.pantallas;
+  // Consulta en tiempo real las pantallas asignadas al usuario actual (reactivo con RTK Query)
+  const { data: misPantallas } = useGetMisPantallasQuery(undefined, {
+    skip: !authUser,
+  });
+
   const rol = authUser?.rol?.toLowerCase();
   const isSuperAdmin = rol === "superadmin" || rol === "admin";
+
+  // Lista de códigos permitidos para el usuario
+  const codigosPermitidos = useMemo(() => {
+    if (misPantallas && Array.isArray(misPantallas)) {
+      return misPantallas.map((p) => p.codigo?.toLowerCase());
+    }
+    if (authUser?.pantallas && Array.isArray(authUser.pantallas) && authUser.pantallas.length > 0) {
+      return authUser.pantallas.map((c) => c.toLowerCase());
+    }
+    return null;
+  }, [misPantallas, authUser?.pantallas]);
 
   // Filtrado reactivo de ítems de menú según permisos de pantalla
   const itemsVisibles = useMemo(() => {
     return navItems.filter((item) => {
       // Normalizar la ruta a código de pantalla (ej: "/" -> "dashboard", "/beneficiarios" -> "beneficiarios")
-      const codigo = item.to === "/" ? "dashboard" : item.to.replace(/^\//, "");
+      const codigo = (item.to === "/" ? "dashboard" : item.to.replace(/^\//, "")).toLowerCase();
 
-      if (pantallasPermitidas && Array.isArray(pantallasPermitidas) && pantallasPermitidas.length > 0) {
-        return pantallasPermitidas.includes(codigo);
+      // Si ya cargaron las pantallas asignadas, se respeta estrictamente la lista de permisos
+      if (codigosPermitidos !== null) {
+        return codigosPermitidos.includes(codigo);
       }
 
-      // Si aún no se cargó el array en la sesión actual, admin/superadmin ve todos los módulos
+      // Si aún está cargando por primera vez en superadmin/admin, muestra todo temporalmente
       if (isSuperAdmin) {
         return true;
       }
@@ -77,7 +94,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
       // Módulos base por defecto para otros roles mientras se sincroniza
       return ["dashboard", "beneficiarios", "hitos", "asistencias", "justificaciones"].includes(codigo);
     });
-  }, [pantallasPermitidas, isSuperAdmin]);
+  }, [codigosPermitidos, isSuperAdmin]);
 
   const { data: justificaciones } = useGetJustificacionesQuery(undefined, {
     skip: !authUser,

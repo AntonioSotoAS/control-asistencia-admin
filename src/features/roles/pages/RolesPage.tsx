@@ -178,14 +178,16 @@ export function RolesPage() {
       />
 
       {/* Modal Asignación de Pantallas y Permisos */}
-      <AsignarPantallasModal
-        isOpen={Boolean(selectedRolForPermisos)}
-        onClose={() => setSelectedRolForPermisos(null)}
-        rol={selectedRolForPermisos}
-        onSuccess={() => {
-          showNotification("Permisos de pantallas actualizados para el rol seleccionado.");
-        }}
-      />
+      {selectedRolForPermisos && (
+        <AsignarPantallasModal
+          isOpen={Boolean(selectedRolForPermisos)}
+          onClose={() => setSelectedRolForPermisos(null)}
+          rol={selectedRolForPermisos}
+          onSuccess={() => {
+            showNotification("Permisos de pantallas actualizados para el rol seleccionado.");
+          }}
+        />
+      )}
     </div>
   );
 }

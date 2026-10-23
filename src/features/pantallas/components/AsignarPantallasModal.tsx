@@ -31,15 +31,18 @@ export function AsignarPantallasModal({
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const { data: allPantallas = [] } = useGetPantallasQuery();
+  const { data: allPantallasData } = useGetPantallasQuery(undefined, {
+    skip: !isOpen,
+  });
+  const allPantallas = allPantallasData || [];
 
   const rolId = rol?.id;
   const {
-    data: pantallas = [],
+    data: pantallasData,
     isLoading,
     isError,
     refetch,
-  } = useGetRolPantallasQuery(rolId ?? 0, {
+  } = useGetRolPantallasQuery(rolId as number, {
     skip: !isOpen || !rolId,
   });
 
@@ -48,16 +51,18 @@ export function AsignarPantallasModal({
 
   // Inicializar selección cuando cargan las pantallas del rol
   useEffect(() => {
-    if (pantallas.length > 0) {
-      const assigned = pantallas.filter((p) => Boolean(p.asignada)).map((p) => p.id);
+    if (!isOpen || !rolId) return;
+
+    if (pantallasData && Array.isArray(pantallasData)) {
+      const assigned = pantallasData
+        .filter((p) => Boolean(p.asignada))
+        .map((p) => p.id);
       setSelectedIds(assigned);
-    } else {
-      setSelectedIds([]);
     }
-  }, [pantallas, rolId]);
+  }, [isOpen, rolId, pantallasData]);
 
   const displayPantallas = useMemo(() => {
-    if (pantallas.length > 0) return pantallas;
+    if (pantallasData && pantallasData.length > 0) return pantallasData;
     if (allPantallas.length > 0) {
       return allPantallas.map((p) => ({
         ...p,
@@ -65,7 +70,7 @@ export function AsignarPantallasModal({
       }));
     }
     return [];
-  }, [pantallas, allPantallas, selectedIds]);
+  }, [pantallasData, allPantallas, selectedIds]);
 
   // Agrupar pantallas por grupo (proceso, administracion, sistema)
   const groupedPantallas = useMemo(() => {
@@ -91,7 +96,7 @@ export function AsignarPantallasModal({
   };
 
   const handleSelectAll = () => {
-    setSelectedIds(pantallas.map((p) => p.id));
+    setSelectedIds(displayPantallas.map((p) => p.id));
   };
 
   const handleDeselectAll = () => {

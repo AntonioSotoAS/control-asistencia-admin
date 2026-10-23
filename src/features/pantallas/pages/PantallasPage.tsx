@@ -256,14 +256,16 @@ export function PantallasPage() {
       />
 
       {/* Modal Asignar Pantallas al Rol (para uso rápido auxiliar) */}
-      <AsignarPantallasModal
-        isOpen={Boolean(selectedRolForPermisos)}
-        onClose={() => setSelectedRolForPermisos(null)}
-        rol={selectedRolForPermisos}
-        onSuccess={() => {
-          showNotification("Permisos de pantallas actualizados para el rol seleccionado.");
-        }}
-      />
+      {selectedRolForPermisos && (
+        <AsignarPantallasModal
+          isOpen={Boolean(selectedRolForPermisos)}
+          onClose={() => setSelectedRolForPermisos(null)}
+          rol={selectedRolForPermisos}
+          onSuccess={() => {
+            showNotification("Permisos de pantallas actualizados para el rol seleccionado.");
+          }}
+        />
+      )}
     </div>
   );
 }

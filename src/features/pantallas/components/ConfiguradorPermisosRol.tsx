@@ -46,17 +46,20 @@ export function ConfiguradorPermisosRol({
   }, [roles, selectedRolId]);
 
   // Consulta del catálogo maestro de pantallas como respaldo
-  const { data: allPantallas = [] } = useGetPantallasQuery();
+  const { data: allPantallasData } = useGetPantallasQuery();
+  const allPantallas = allPantallasData || [];
+
+  const currentRolId = currentRol?.id;
 
   // Consulta de pantallas para el rol seleccionado: GET /api/roles/{rolId}/pantallas
   const {
-    data: pantallas = [],
+    data: pantallasData,
     isLoading: isLoadingPantallas,
     isFetching,
     isError,
     refetch,
-  } = useGetRolPantallasQuery(currentRol?.id ?? 0, {
-    skip: !currentRol?.id,
+  } = useGetRolPantallasQuery(currentRolId as number, {
+    skip: !currentRolId,
   });
 
   const [asignarPantallas, { isLoading: isSaving }] =
@@ -64,19 +67,20 @@ export function ConfiguradorPermisosRol({
 
   // Sincronizar selección inicial al cargar las pantallas del rol
   useEffect(() => {
-    if (pantallas.length > 0) {
-      const assigned = pantallas.filter((p) => Boolean(p.asignada)).map((p) => p.id);
+    if (!currentRolId) return;
+
+    if (pantallasData && Array.isArray(pantallasData)) {
+      const assigned = pantallasData
+        .filter((p) => Boolean(p.asignada))
+        .map((p) => p.id);
       setSelectedIds(assigned);
       setInitialIds(assigned);
-    } else {
-      setSelectedIds([]);
-      setInitialIds([]);
     }
-  }, [pantallas, currentRol?.id]);
+  }, [pantallasData, currentRolId]);
 
   // Lista definitiva de pantallas a mostrar
   const displayPantallas = useMemo(() => {
-    if (pantallas.length > 0) return pantallas;
+    if (pantallasData && pantallasData.length > 0) return pantallasData;
     if (allPantallas.length > 0) {
       return allPantallas.map((p) => ({
         ...p,
@@ -84,7 +88,7 @@ export function ConfiguradorPermisosRol({
       }));
     }
     return [];
-  }, [pantallas, allPantallas, selectedIds]);
+  }, [pantallasData, allPantallas, selectedIds]);
 
   const hasChanges = useMemo(() => {
     if (selectedIds.length !== initialIds.length) return true;
