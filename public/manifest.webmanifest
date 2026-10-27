@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/web-manifest-combined.json",
-  "name": "Control de Asistencia - Panel Administrativo",
-  "short_name": "Asistencias",
-  "description": "Plataforma Institucional de Supervisión y Control de Asistencia para Medidas Judiciales de Familia",
+  "name": "SIGMA-T — Sistema Integrado de Gestión y Monitoreo de Acompañamiento Terapéutico",
+  "short_name": "SIGMA-T",
+  "description": "SIGMA-T — Sistema Integrado de Gestión y Monitoreo de Acompañamiento Terapéutico",
   "start_url": "/",
   "id": "/?source=pwa",
   "scope": "/",

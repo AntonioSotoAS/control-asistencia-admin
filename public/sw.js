@@ -1,9 +1,9 @@
 /* ==========================================================================
-   Service Worker — Sistema de Control de Asistencia PWA
+   Service Worker — SIGMA-T PWA
    Autor: Antonio Soto
    ========================================================================== */
 
-const CACHE_NAME = 'control-asistencia-cache-v3';
+const CACHE_NAME = 'sigma-t-cache-v1';
 
 // Recursos esenciales para la concha de la aplicación (App Shell)
 const STATIC_ASSETS = [

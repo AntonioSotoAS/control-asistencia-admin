@@ -1,4 +1,4 @@
-# ⚖️ Sistema de Control de Asistencia — Panel Administrativo
+# ⚖️ SIGMA-T — Panel Administrativo
 
 <div align="center">
 
@@ -9,7 +9,7 @@
 ![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-RTK_Query-764ABC?style=for-the-badge&logo=redux&logoColor=white)
 ![License](https://img.shields.io/badge/License-Proprietary-guinda?style=for-the-badge)
 
-**Plataforma Integral de Supervisión y Control de Asistencia para Medidas de Protección y Procesos Judiciales de Familia**
+**SIGMA-T: Sistema Integrado de Gestión y Monitoreo de Acompañamiento Terapéutico**
 
 *Diseñado y desarrollado por **Antonio Soto***
 
@@ -25,7 +25,7 @@
 
 ## 📌 Descripción del Proyecto
 
-El **Sistema de Control de Asistencia (Panel Administrativo)** es una solución web institucional de alta fidelidad diseñada para el monitoreo, fiscalización y seguimiento de comparecencias obligatorias de personas con mandatos judiciales en juzgados de familia (medidas de protección, asistencia a terapias, programas multidisciplinarios y cumplimiento de hitos procesales).
+El **SIGMA-T (Sistema Integrado de Gestión y Monitoreo de Acompañamiento Terapéutico — Panel Administrativo)** es una solución web institucional de alta fidelidad diseñada para el monitoreo, fiscalización y seguimiento de comparecencias obligatorias de personas con mandatos judiciales en juzgados de familia (medidas de protección, asistencia a terapias, programas multidisciplinarios y cumplimiento de hitos procesales).
 
 Ofrece una interfaz ágil, reactiva y elegante para personal judicial, administradores y especialistas, con soporte en tiempo real de semáforos de cumplimiento, auditoría de inasistencias y gestión descentralizada de permisos por rol.
 

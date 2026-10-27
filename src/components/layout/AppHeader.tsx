@@ -76,8 +76,8 @@ export function AppHeader({ onToggleSidebar }: AppHeaderProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const currentRoute = routeTitles[location.pathname] || {
-    title: "Control de Asistencia",
-    subtitle: "Sistema Institucional",
+    title: "SIGMA-T",
+    subtitle: "Sistema Integrado de Gestión y Monitoreo",
   };
   const authUser = useAppSelector((state) => state.auth.user);
   const { isInstallable, promptInstall } = usePWAInstall();

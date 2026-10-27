@@ -208,7 +208,7 @@ export function MonitorInasistencias({
                 : "";
               const whatsappUrl = cleanPhone
                 ? `https://wa.me/51${cleanPhone}?text=${encodeURIComponent(
-                  `Estimado(a) ${item.nombre}, le escribimos del Control de Asistencia respecto a su ${item.tipo === "FALTA" ? "inasistencia" : "tardanza"
+                  `Estimado(a) ${item.nombre}, le escribimos de SIGMA-T respecto a su ${item.tipo === "FALTA" ? "inasistencia" : "tardanza"
                   } del ${item.fecha}. Por favor comunicarse para coordinar su regularización.`
                 )}`
                 : null;

@@ -13,7 +13,6 @@ import {
   SlidersHorizontal,
   LogOut,
   X,
-  Shield,
 } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
@@ -137,14 +136,16 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
         {/* Brand Header */}
         <div className="h-20 px-6 flex items-center justify-between border-b border-linea/70 bg-[#faf9f6]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-tile bg-guinda text-white flex items-center justify-center font-bold text-lg shadow-sm">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
+            <img
+              src="/logo/sigma-lOGO-192.png"
+              alt="SIGMA-T"
+              className="w-10 h-10 rounded-tile object-contain bg-white p-0.5 shadow-xs border border-linea/60"
+            />
             <div className="flex flex-col">
-              <span className="font-extrabold text-base text-carbon tracking-tight leading-tight">
-                Control Asistencia
+              <span className="font-extrabold text-lg text-carbon tracking-tight leading-tight">
+                SIGMA-T
               </span>
-              <span className="text-xs font-semibold text-olivo uppercase tracking-wider">
+              <span className="text-[11px] font-semibold text-olivo uppercase tracking-wider">
                 Panel Administrativo
               </span>
             </div>

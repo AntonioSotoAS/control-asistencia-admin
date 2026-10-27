@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { Shield, Lock, User, Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
+import { Lock, User, Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
 import { useLoginMutation } from "../services/authApi";
 import { useAppDispatch } from "@/app/hooks";
 import { setCredentials } from "../services/authSlice";
@@ -130,15 +130,19 @@ export function LoginPage() {
         {/* Form Container */}
         <div className="w-full max-w-[380px] sm:max-w-[400px] mx-auto z-10 my-auto py-4">
           {/* Emblem & Headers */}
-          <div className="text-center mb-8">
-            <div className="mx-auto w-16 h-16 rounded-full bg-[#73101a] text-white flex items-center justify-center shadow-lg shadow-[#73101a]/25 ring-8 ring-[#73101a]/5 mb-5 transition-transform duration-300 hover:scale-105">
-              <Shield className="w-8 h-8 text-white stroke-[2.2]" />
+          <div className="text-center mb-7">
+            <div className="mx-auto w-20 h-20 rounded-2xl bg-white border border-slate-200/90 p-2 shadow-lg shadow-slate-200/60 mb-4 transition-transform duration-300 hover:scale-105 flex items-center justify-center">
+              <img
+                src="/logo/SIGMA-Logo-512.png"
+                alt="SIGMA-T"
+                className="w-full h-full object-contain"
+              />
             </div>
-            <h1 className="text-2xl sm:text-[26px] font-black text-slate-800 tracking-tight">
-              Control de Asistencia
+            <h1 className="text-3xl font-black text-slate-800 tracking-tight">
+              SIGMA-T
             </h1>
-            <p className="text-xs sm:text-sm font-semibold text-slate-500 mt-1">
-              Plataforma Institucional de Supervisión
+            <p className="text-xs sm:text-sm font-semibold text-slate-600 mt-1 max-w-[340px] mx-auto leading-snug">
+              Sistema Integrado de Gestión y Monitoreo de Acompañamiento Terapéutico
             </p>
           </div>
 
@@ -220,7 +224,7 @@ export function LoginPage() {
 
         {/* Footer */}
         <footer className="mt-4 text-center text-xs text-slate-400 font-medium z-10 shrink-0">
-          Sistema de Control de Asistencia &copy; {new Date().getFullYear()}
+          SIGMA-T &copy; {new Date().getFullYear()}
         </footer>
       </div>
 
@@ -228,7 +232,7 @@ export function LoginPage() {
       <div className="hidden lg:block lg:flex-1 h-full relative overflow-hidden bg-[#e6e2da] select-none">
         <img
           src="/img/login/fondo_derecho_control_asistencia.png"
-          alt="Control de Asistencia"
+          alt="SIGMA-T"
           className="w-full h-full object-cover object-center scale-[1.01]"
         />
       </div>

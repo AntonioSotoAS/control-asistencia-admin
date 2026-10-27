@@ -33,7 +33,7 @@ export function FichaContactoModal({
 
   // Mensaje predeterminado de WhatsApp para el beneficiario
   const whatsappMessage = encodeURIComponent(
-    `Estimado(a) ${alerta.nombre}, le escribimos del Área de Control de Asistencia respecto a su ${isFalta ? "inasistencia (falta)" : "tardanza"
+    `Estimado(a) ${alerta.nombre}, le escribimos del Área de Monitoreo SIGMA-T respecto a su ${isFalta ? "inasistencia (falta)" : "tardanza"
     } registrada el día ${alerta.fecha} en la sesión (${alerta.hitoNombre}). Le recordamos que es necesario regularizar o justificar su asistencia para el cumplimiento de sus compromisos institucionales.`
   );
 
@@ -174,7 +174,7 @@ export function FichaContactoModal({
           {/* Correo Electrónico */}
           {alerta.email && (
             <a
-              href={`mailto:${alerta.email}?subject=Notificación de Control de Asistencia - Inasistencia`}
+              href={`mailto:${alerta.email}?subject=Notificación SIGMA-T - Inasistencia`}
               className="flex items-center justify-between p-3 rounded-field bg-white border border-linea hover:border-guinda/60 text-xs transition"
             >
               <div className="flex items-center gap-2 text-olivo">
