@@ -3,20 +3,18 @@
    Autor: Antonio Soto
    ========================================================================== */
 
-const CACHE_NAME = 'control-asistencia-cache-v2';
+const CACHE_NAME = 'control-asistencia-cache-v3';
 
 // Recursos esenciales para la concha de la aplicación (App Shell)
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
-  '/favicon.svg',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  '/icons/icon-maskable-192.png',
-  '/icons/icon-maskable-512.png',
-  '/icons/apple-touch-icon.png',
-  '/icons/icon.svg'
+  '/manifest.json',
+  '/logo/sigma-lOGO-192.png',
+  '/logo/SIGMA-Logo-512.png',
+  '/logo/sigma-lOGO-192.ico',
+  '/logo/SIGMA-Logo-512.ico'
 ];
 
 // Instalación: Precarga de la App Shell y activación inmediata
