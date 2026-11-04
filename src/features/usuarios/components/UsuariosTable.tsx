@@ -108,6 +108,15 @@ export function UsuariosTable({
     }
   };
 
+  // Ordenar personas/usuarios sin rol al inicio antes de renderizar
+  const sortedUsers = [...usuarios].sort((a, b) => {
+    const hasRoleA = (a.rol || (a as any).role || (a as any).role_id) && !a.esPersonaSinCuenta && a.rol !== "sin rol" && a.rol !== "sin_rol";
+    const hasRoleB = (b.rol || (b as any).role || (b as any).role_id) && !b.esPersonaSinCuenta && b.rol !== "sin rol" && b.rol !== "sin_rol";
+    if (!hasRoleA && hasRoleB) return -1;
+    if (hasRoleA && !hasRoleB) return 1;
+    return 0;
+  });
+
   return (
     <Table>
       <TableHeader>
@@ -122,7 +131,7 @@ export function UsuariosTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {usuarios.map((u) => {
+        {sortedUsers.map((u) => {
           const personaNombre =
             u.persona?.nombres && u.persona?.apellidos
               ? `${u.persona.nombres} ${u.persona.apellidos}`

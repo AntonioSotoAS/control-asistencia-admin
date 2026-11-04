@@ -43,7 +43,6 @@ const navItems: NavItem[] = [
     to: "/justificaciones",
     icon: FileCheck2,
   },
-  { name: "Reportes", to: "/reportes", icon: BarChart3 },
   { name: "Usuarios", to: "/usuarios", icon: UserCog },
   { name: "Personas", to: "/personas", icon: UserCheck },
   { name: "Roles", to: "/roles", icon: ShieldCheck },
