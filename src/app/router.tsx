@@ -12,6 +12,7 @@ import { UsuariosPage } from "@/features/usuarios/pages/UsuariosPage";
 import { PersonasPage } from "@/features/personas/pages/PersonasPage";
 import { RolesPage } from "@/features/roles/pages/RolesPage";
 import { PantallasPage } from "@/features/pantallas/pages/PantallasPage";
+import { FaqsPage } from "@/features/faqs/pages/FaqsPage";
 
 export function AppRouter() {
   return (
@@ -32,6 +33,7 @@ export function AppRouter() {
         <Route path="personas" element={<PersonasPage />} />
         <Route path="roles" element={<RolesPage />} />
         <Route path="pantallas" element={<PantallasPage />} />
+        <Route path="faqs" element={<FaqsPage />} />
       </Route>
 
       {/* Catch-all redirect */}
