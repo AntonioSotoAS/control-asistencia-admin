@@ -255,20 +255,31 @@ export function DashboardPage() {
       Sáb: { presentes: 0, tardanzas: 0, faltas: 0 },
     };
 
+    const today = new Date().toISOString().split("T")[0];
+
     sesiones.forEach((s) => {
       if (!s.fecha) return;
-      const d = new Date(s.fecha + "T00:00:00");
+      // Extraer fecha limpia (YYYY-MM-DD) sin importar si viene en formato ISO con T o Z
+      const cleanDate = typeof s.fecha === "string" ? s.fecha.split("T")[0] : "";
+      if (!cleanDate) return;
+
+      const [year, month, day] = cleanDate.split("-").map(Number);
+      if (!year || !month || !day) return;
+      const d = new Date(year, month - 1, day);
       const diaNum = d.getDay();
       const diaNombre = diasSemana[diaNum];
       if (!diaNombre) return;
 
-      const estado = (s.estado || "").toUpperCase();
-      if (estado.includes("TARDANZA")) {
+      const rawEstado = (s.estado || "").toUpperCase();
+      const rawNotas = (s.notas || s.observacion || "").toUpperCase();
+      const isAsistio = Boolean(s.asistio);
+
+      if (rawEstado.includes("TARDANZA") || rawNotas.includes("TARDANZA")) {
         conteoPorDia[diaNombre].tardanzas += 1;
-      } else if (estado.includes("FALTA") || estado.includes("AUSENTE")) {
-        conteoPorDia[diaNombre].faltas += 1;
-      } else {
+      } else if (isAsistio || rawEstado.includes("PRESENTE") || rawEstado.includes("ASISTIO")) {
         conteoPorDia[diaNombre].presentes += 1;
+      } else if (rawEstado.includes("FALTA") || rawEstado.includes("AUSENTE") || cleanDate <= today) {
+        conteoPorDia[diaNombre].faltas += 1;
       }
     });
 
