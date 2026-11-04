@@ -244,6 +244,7 @@ export function DashboardPage() {
       4: "Jue",
       5: "Vie",
       6: "Sáb",
+      0: "Dom",
     };
 
     const conteoPorDia: { [key: string]: { presentes: number; tardanzas: number; faltas: number } } = {
@@ -253,6 +254,7 @@ export function DashboardPage() {
       Jue: { presentes: 0, tardanzas: 0, faltas: 0 },
       Vie: { presentes: 0, tardanzas: 0, faltas: 0 },
       Sáb: { presentes: 0, tardanzas: 0, faltas: 0 },
+      Dom: { presentes: 0, tardanzas: 0, faltas: 0 },
     };
 
     const today = new Date().toISOString().split("T")[0];

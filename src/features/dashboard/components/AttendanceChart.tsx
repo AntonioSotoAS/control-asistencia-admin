@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   BarChart,
   Bar,
@@ -9,8 +8,8 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { Card, CardHeader, CardTitle, CardDescription, Button } from "@/components/ui";
-import { Info, Sparkles } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui";
+import { Info } from "lucide-react";
 import type { TendenciaAsistencia } from "../types/dashboard.types";
 
 interface AttendanceChartProps {
@@ -24,28 +23,17 @@ const emptyWeekData: TendenciaAsistencia[] = [
   { dia: "Jue", presentes: 0, tardanzas: 0, faltas: 0 },
   { dia: "Vie", presentes: 0, tardanzas: 0, faltas: 0 },
   { dia: "Sáb", presentes: 0, tardanzas: 0, faltas: 0 },
-];
-
-const demoWeekData: TendenciaAsistencia[] = [
-  { dia: "Lun", presentes: 18, tardanzas: 3, faltas: 2 },
-  { dia: "Mar", presentes: 22, tardanzas: 1, faltas: 1 },
-  { dia: "Mié", presentes: 20, tardanzas: 4, faltas: 3 },
-  { dia: "Jue", presentes: 25, tardanzas: 2, faltas: 0 },
-  { dia: "Vie", presentes: 19, tardanzas: 5, faltas: 2 },
-  { dia: "Sáb", presentes: 12, tardanzas: 1, faltas: 4 },
+  { dia: "Dom", presentes: 0, tardanzas: 0, faltas: 0 },
 ];
 
 export function AttendanceChart({ data }: AttendanceChartProps) {
-  const [showDemo, setShowDemo] = useState(false);
+  const chartData = data && data.length > 0 ? data : emptyWeekData;
 
-  const realData = data && data.length > 0 ? data : emptyWeekData;
-  const totalReal = realData.reduce(
+  const totalAsistencias = chartData.reduce(
     (acc, item) =>
       acc + (item.presentes || 0) + (item.tardanzas || 0) + (item.faltas || 0),
     0
   );
-
-  const chartData = showDemo ? demoWeekData : realData;
 
   return (
     <Card className="h-full flex flex-col">
@@ -58,38 +46,15 @@ export function AttendanceChart({ data }: AttendanceChartProps) {
             Distribución de beneficiarios presentes, tardanzas y ausencias por día
           </CardDescription>
         </div>
-
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="text-xs flex items-center gap-1.5 h-8 px-2.5 border-dashed"
-          onClick={() => setShowDemo(!showDemo)}
-        >
-          <Sparkles className="w-3.5 h-3.5 text-[#562599]" />
-          <span>{showDemo ? "Ver Datos Reales" : "Ver Ejemplo"}</span>
-        </Button>
       </CardHeader>
 
-      {/* Alerta contextual cuando no hay datos en la BD */}
-      {!showDemo && totalReal === 0 && (
+      {/* Indicador contextual de datos reales */}
+      {totalAsistencias === 0 && (
         <div className="mx-6 mb-2 p-2.5 rounded-lg bg-surface-muted/60 border border-border-soft flex items-center gap-2 text-xs text-ink-secondary">
           <Info className="w-4 h-4 text-[#562599] shrink-0" />
           <span>
-            Sin registros de sesiones en la semana actual. Las barras se dibujarán automáticamente al registrar asistencias, o pulsa <strong>"Ver Ejemplo"</strong> para previsualizarlo.
+            No hay sesiones registradas para los días de esta semana en el sistema.
           </span>
-        </div>
-      )}
-
-      {showDemo && (
-        <div className="mx-6 mb-2 p-2 rounded-lg bg-[#562599]/10 border border-[#562599]/20 flex items-center justify-between text-xs text-[#562599] font-medium">
-          <span>Vista previa con datos de simulación activada.</span>
-          <button
-            onClick={() => setShowDemo(false)}
-            className="underline text-xs hover:opacity-80"
-          >
-            Volver a datos reales
-          </button>
         </div>
       )}
 
