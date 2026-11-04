@@ -8,7 +8,7 @@ import {
   Badge,
   Button,
 } from "@/components/ui";
-import { Edit2, Trash2, Users, AlertCircle, Loader2, UserPlus, ShieldAlert } from "lucide-react";
+import { Edit2, Trash2, Users, AlertCircle, Loader2 } from "lucide-react";
 import type { Usuario, RolUsuario } from "../types/usuario.types";
 
 export function tieneRolDefinido(u: Usuario): boolean {
@@ -36,7 +36,6 @@ export function UsuariosTable({
   error,
   onEdit,
   onDelete,
-  onAsignarRol,
   onRetry,
 }: UsuariosTableProps) {
   if (isLoading) {

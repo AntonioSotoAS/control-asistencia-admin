@@ -152,7 +152,7 @@ export function HitosAdminTable({
                   aria-label={`Seleccionar beneficiario #${beneficiarioId}`}
                   className="w-4 h-4 rounded text-guinda focus:ring-guinda border-linea cursor-pointer align-middle"
                   checked={isSelected}
-                  onChange={(e) => {
+                  onChange={() => {
                     onToggleSelectBeneficiary?.(beneficiarioId);
                   }}
                 />

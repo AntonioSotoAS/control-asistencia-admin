@@ -6,11 +6,11 @@ import {
   Flag,
   CalendarCheck2,
   FileCheck2,
-  BarChart3,
   UserCog,
   UserCheck,
   ShieldCheck,
   SlidersHorizontal,
+  HelpCircle,
   LogOut,
   X,
 } from "lucide-react";
@@ -47,6 +47,7 @@ const navItems: NavItem[] = [
   { name: "Personas", to: "/personas", icon: UserCheck },
   { name: "Roles", to: "/roles", icon: ShieldCheck },
   { name: "Pantallas", to: "/pantallas", icon: SlidersHorizontal },
+  { name: "FAQs", to: "/faqs", icon: HelpCircle },
 ];
 
 export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
@@ -90,7 +91,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
       }
 
       // Módulos base por defecto para otros roles mientras se sincroniza
-      return ["dashboard", "beneficiarios", "hitos", "asistencias", "justificaciones"].includes(codigo);
+      return ["dashboard", "beneficiarios", "hitos", "asistencias", "justificaciones", "faqs"].includes(codigo);
     });
   }, [codigosPermitidos, isSuperAdmin]);
 
