@@ -33,6 +33,9 @@ export interface Usuario {
   // Campos complementarios en caso de join directo del backend
   nombre?: string;
   correo?: string;
+  // Identificador de persona sin cuenta de usuario asignada
+  esPersonaSinCuenta?: boolean;
+  personaOriginal?: unknown;
 }
 
 export interface CrearUsuarioPayload {

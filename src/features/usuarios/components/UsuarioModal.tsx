@@ -18,6 +18,7 @@ interface UsuarioModalProps {
   isOpen: boolean;
   onClose: () => void;
   usuarioToEdit?: Usuario | null;
+  initialPersona?: Persona | PersonaInfo | null;
   onSaveCreate: (data: CrearUsuarioPayload) => Promise<void>;
   onSaveUpdate: (data: ActualizarUsuarioPayload) => Promise<void>;
   isLoading?: boolean;
@@ -43,6 +44,7 @@ export function UsuarioModal({
   isOpen,
   onClose,
   usuarioToEdit,
+  initialPersona,
   onSaveCreate,
   onSaveUpdate,
   isLoading,
@@ -95,6 +97,14 @@ export function UsuarioModal({
       setEstado(usuarioToEdit.estado || "activo");
       setSelectedPersona(usuarioToEdit.persona || null);
       setSearchPersona("");
+    } else if (initialPersona) {
+      setPersonaId(initialPersona.id);
+      setIdentificador(initialPersona.dni || (initialPersona as { expediente?: string }).expediente || "");
+      setPassword("");
+      setRol("asistente");
+      setEstado("activo");
+      setSelectedPersona(initialPersona);
+      setSearchPersona("");
     } else {
       setPersonaId("");
       setIdentificador("");
@@ -104,7 +114,7 @@ export function UsuarioModal({
       setSelectedPersona(null);
       setSearchPersona("");
     }
-  }, [usuarioToEdit, isOpen]);
+  }, [usuarioToEdit, initialPersona, isOpen]);
 
   const handleSelectPersona = (p: Persona) => {
     setSelectedPersona(p);

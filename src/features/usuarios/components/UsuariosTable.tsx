@@ -8,8 +8,15 @@ import {
   Badge,
   Button,
 } from "@/components/ui";
-import { Edit2, Trash2, Users, AlertCircle, Loader2 } from "lucide-react";
+import { Edit2, Trash2, Users, AlertCircle, Loader2, UserPlus, ShieldAlert } from "lucide-react";
 import type { Usuario, RolUsuario } from "../types/usuario.types";
+
+export function tieneRolDefinido(u: Usuario): boolean {
+  if (u.esPersonaSinCuenta) return false;
+  if (!u.rol) return false;
+  const r = String(u.rol).trim().toLowerCase();
+  return r !== "" && r !== "sin rol" && r !== "sin_rol" && r !== "sin definir" && r !== "pendiente";
+}
 
 interface UsuariosTableProps {
   usuarios: Usuario[];
@@ -18,6 +25,7 @@ interface UsuariosTableProps {
   error?: unknown;
   onEdit: (usuario: Usuario) => void;
   onDelete: (usuario: Usuario) => void;
+  onAsignarRol?: (usuario: Usuario) => void;
   onRetry?: () => void;
 }
 
@@ -28,6 +36,7 @@ export function UsuariosTable({
   error,
   onEdit,
   onDelete,
+  onAsignarRol,
   onRetry,
 }: UsuariosTableProps) {
   if (isLoading) {
