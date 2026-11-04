@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router";
 import { BeneficiarioFilter } from "../components/BeneficiarioFilter";
 import { BeneficiariosTable } from "../components/BeneficiariosTable";
 import { BeneficiarioDetalleModal } from "../components/BeneficiarioDetalleModal";
+import { ReporteHitoModal } from "@/features/hitos/components/ReporteHitoModal";
 import { useGetBeneficiariosQuery } from "../services/beneficiariosApi";
 import type { Beneficiario } from "../types/beneficiario.types";
 import {
@@ -142,6 +143,8 @@ export function BeneficiariosPage() {
 
   const [selectedBeneficiario, setSelectedBeneficiario] =
     useState<Beneficiario | null>(null);
+  const [selectedHitoIdForReporte, setSelectedHitoIdForReporte] =
+    useState<number | null>(null);
 
   // Debounce search input
   useEffect(() => {
@@ -308,6 +311,14 @@ export function BeneficiariosPage() {
         isOpen={Boolean(selectedBeneficiario)}
         onClose={() => setSelectedBeneficiario(null)}
         beneficiario={selectedBeneficiario}
+        onGenerarReporte={(hitoId) => setSelectedHitoIdForReporte(hitoId)}
+      />
+
+      {/* Modal Reporte Oficial de Cumplimiento de Hito */}
+      <ReporteHitoModal
+        isOpen={Boolean(selectedHitoIdForReporte)}
+        onClose={() => setSelectedHitoIdForReporte(null)}
+        hitoId={selectedHitoIdForReporte}
       />
     </div>
   );

@@ -3,6 +3,7 @@ import { HitosAdminTable } from "../components/HitosAdminTable";
 import { DetalleHitoAdminModal } from "../components/DetalleHitoAdminModal";
 import { AgendarFechasModal } from "../components/AgendarFechasModal";
 import { RevisarHitoModal } from "../components/RevisarHitoModal";
+import { ReporteHitoModal } from "../components/ReporteHitoModal";
 import { Button, Card } from "@/components/ui";
 import {
   Search,
@@ -49,6 +50,8 @@ export function HitosPage() {
   const [selectedHitoForAgendar, setSelectedHitoForAgendar] =
     useState<HitoAdmin | null>(null);
   const [selectedHitoForRevisar, setSelectedHitoForRevisar] =
+    useState<HitoAdmin | null>(null);
+  const [selectedHitoForReporte, setSelectedHitoForReporte] =
     useState<HitoAdmin | null>(null);
 
   const [notification, setNotification] = useState<string | null>(null);
@@ -125,6 +128,10 @@ export function HitosPage() {
     if (hito.id) {
       setSelectedHitoDetailId(hito.id);
     }
+  };
+
+  const handleOpenReporte = (hito: HitoAdmin) => {
+    setSelectedHitoForReporte(hito);
   };
 
   const handleSaveAgendarFechas = async (payload: AgendarFechasHitoPayload) => {
@@ -378,6 +385,7 @@ export function HitosPage() {
           onViewDetail={handleViewDetail}
           onAgendarFechas={handleOpenAgendar}
           onRevisar={handleOpenRevisar}
+          onGenerarReporte={handleOpenReporte}
           onRetry={() => refetch()}
         />
       </div>
@@ -389,6 +397,7 @@ export function HitosPage() {
         hitoId={selectedHitoDetailId}
         onAgendarFechas={handleOpenAgendar}
         onRevisar={handleOpenRevisar}
+        onGenerarReporte={handleOpenReporte}
       />
 
       {/* Modal para POST /api/hitos/fechas */}
@@ -408,6 +417,14 @@ export function HitosPage() {
         hito={selectedHitoForRevisar}
         onRevisar={handleSaveRevisarHito}
         isLoading={isRevisando}
+      />
+
+      {/* Modal de Constancia y Reporte Oficial del Hito (Descarga/Impresión PDF) */}
+      <ReporteHitoModal
+        isOpen={Boolean(selectedHitoForReporte)}
+        onClose={() => setSelectedHitoForReporte(null)}
+        hitoId={selectedHitoForReporte?.id || null}
+        hitoFallback={selectedHitoForReporte}
       />
     </div>
   );

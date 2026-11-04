@@ -20,6 +20,7 @@ interface DetalleHitoAdminModalProps {
   hitoId: number | null;
   onAgendarFechas?: (hito: HitoAdmin) => void;
   onRevisar?: (hito: HitoAdmin) => void;
+  onGenerarReporte?: (hito: HitoAdmin) => void;
 }
 
 export function DetalleHitoAdminModal({
@@ -28,6 +29,7 @@ export function DetalleHitoAdminModal({
   hitoId,
   onAgendarFechas,
   onRevisar,
+  onGenerarReporte,
 }: DetalleHitoAdminModalProps) {
   const { data: hito, isLoading } = useGetHitoAdminByIdQuery(hitoId!, {
     skip: !isOpen || !hitoId,
@@ -103,6 +105,21 @@ export function DetalleHitoAdminModal({
                 leftIcon={<CalendarPlus className="w-4 h-4 text-guinda" />}
               >
                 Agendar Fechas
+              </Button>
+            )}
+
+            {hito && onGenerarReporte && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => {
+                  onClose();
+                  onGenerarReporte(hito);
+                }}
+                leftIcon={<FileText className="w-4 h-4 text-white" />}
+                className="bg-[#562599] hover:bg-[#471e7f] text-white font-bold"
+              >
+                Reporte PDF
               </Button>
             )}
           </div>

@@ -20,6 +20,7 @@ interface BeneficiarioDetalleModalProps {
   isOpen: boolean;
   onClose: () => void;
   beneficiario: Beneficiario | null;
+  onGenerarReporte?: (hitoId: number) => void;
 }
 
 export function getSeguimientoBadgeConfig(seguimiento?: SeguimientoTipo | string | null): {
@@ -46,6 +47,7 @@ export function BeneficiarioDetalleModal({
   isOpen,
   onClose,
   beneficiario,
+  onGenerarReporte,
 }: BeneficiarioDetalleModalProps) {
   if (!beneficiario) return null;
 
@@ -230,12 +232,26 @@ export function BeneficiarioDetalleModal({
               <span>Hito Activo de Control y Asistencia</span>
             </div>
             {hito && (
-              <Badge
-                variant={hito.completado ? "success" : "info"}
-                className="text-[11px] font-bold"
-              >
-                {hito.completado ? "Hito Completado" : "En Seguimiento"}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant={hito.completado ? "success" : "info"}
+                  className="text-[11px] font-bold"
+                >
+                  {hito.completado ? "Hito Completado" : "En Seguimiento"}
+                </Badge>
+                {onGenerarReporte && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onGenerarReporte(hito.id)}
+                    leftIcon={<FileText className="w-3.5 h-3.5 text-[#562599]" />}
+                    className="text-xs h-7 px-2.5 font-bold text-[#562599] border-[#562599]/30 hover:bg-[#562599]/10"
+                    title="Imprimir o guardar reporte oficial PDF del hito"
+                  >
+                    Reporte PDF
+                  </Button>
+                )}
+              </div>
             )}
           </div>
 

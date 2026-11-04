@@ -20,6 +20,7 @@ import {
   Loader2,
   Flag,
   CalendarX2,
+  FileText,
 } from "lucide-react";
 import type { HitoAdmin } from "../types/hito.types";
 
@@ -32,6 +33,7 @@ interface HitosAdminTableProps {
   onViewDetail: (hito: HitoAdmin) => void;
   onAgendarFechas: (hito: HitoAdmin) => void;
   onRevisar: (hito: HitoAdmin) => void;
+  onGenerarReporte?: (hito: HitoAdmin) => void;
   onRetry?: () => void;
 }
 
@@ -44,6 +46,7 @@ export function HitosAdminTable({
   onViewDetail,
   onAgendarFechas,
   onRevisar,
+  onGenerarReporte,
   onRetry,
 }: HitosAdminTableProps) {
   if (isLoading) {
@@ -275,6 +278,20 @@ export function HitosAdminTable({
                         title="Ver detalle del hito y sus sesiones (GET /api/admin/hitos/{id})"
                       >
                         Detalle
+                      </Button>
+                    )}
+
+                    {/* Reporte / Constancia PDF */}
+                    {item.id && onGenerarReporte && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onGenerarReporte(item)}
+                        leftIcon={<FileText className="w-3.5 h-3.5 text-[#562599]" />}
+                        className="p-1.5 h-8 text-xs text-[#562599] hover:bg-[#562599]/10 font-bold"
+                        title="Generar constancia / reporte PDF de este hito para el beneficiario"
+                      >
+                        Reporte
                       </Button>
                     )}
 
