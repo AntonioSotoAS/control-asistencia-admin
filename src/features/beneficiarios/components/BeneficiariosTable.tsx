@@ -24,6 +24,8 @@ import type { Beneficiario, SeguimientoTipo } from "../types/beneficiario.types"
 interface BeneficiariosTableProps {
   beneficiarios: Beneficiario[];
   isLoading?: boolean;
+  selectedBeneficiaries?: number[];
+  onToggleSelectBeneficiary?: (id: number) => void;
   onViewDetails: (beneficiario: Beneficiario) => void;
 }
 
@@ -71,6 +73,8 @@ export function getSeguimientoBadge(seguimiento?: SeguimientoTipo | string | nul
 export function BeneficiariosTable({
   beneficiarios,
   isLoading,
+  selectedBeneficiaries,
+  onToggleSelectBeneficiary,
   onViewDetails,
 }: BeneficiariosTableProps) {
   if (isLoading) {
@@ -101,6 +105,28 @@ export function BeneficiariosTable({
       <Table>
         <TableHeader>
           <TableRow className="bg-[#faf9f6]">
+            {selectedBeneficiaries !== undefined && (
+              <TableHead className="w-10 text-center">
+                <input
+                  type="checkbox"
+                  aria-label="Seleccionar todos"
+                  className="rounded text-guinda focus:ring-guinda border-linea cursor-pointer align-middle"
+                  checked={
+                    beneficiarios.length > 0 &&
+                    beneficiarios.every((b) => selectedBeneficiaries.includes(b.id))
+                  }
+                  onChange={(e) => {
+                    if (onToggleSelectBeneficiary) {
+                      beneficiarios.forEach((b) => {
+                        const isIncluded = selectedBeneficiaries.includes(b.id);
+                        if (e.target.checked && !isIncluded) onToggleSelectBeneficiary(b.id);
+                        if (!e.target.checked && isIncluded) onToggleSelectBeneficiary(b.id);
+                      });
+                    }
+                  }}
+                />
+              </TableHead>
+            )}
             <TableHead className="font-extrabold text-carbon">Beneficiario / Causa</TableHead>
             <TableHead className="font-extrabold text-carbon">DNI</TableHead>
             <TableHead className="font-extrabold text-carbon">Seguimiento</TableHead>
@@ -121,6 +147,23 @@ export function BeneficiariosTable({
                 className="hover:bg-suave/40 transition-colors cursor-pointer"
                 onClick={() => onViewDetails(b)}
               >
+                {selectedBeneficiaries !== undefined && (
+                  <TableCell className="w-10 text-center" onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      aria-label={`Seleccionar ${b.nombre}`}
+                      className="rounded text-guinda focus:ring-guinda border-linea cursor-pointer align-middle"
+                      checked={selectedBeneficiaries.includes(b.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          onToggleSelectBeneficiary?.(b.id);
+                        } else {
+                          onToggleSelectBeneficiary?.(b.id);
+                        }
+                      }}
+                    />
+                  </TableCell>
+                )}
                 {/* Beneficiario / Causa */}
                 <TableCell>
                   <div className="flex flex-col gap-0.5">

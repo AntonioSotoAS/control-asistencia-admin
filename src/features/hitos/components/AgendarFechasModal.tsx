@@ -11,6 +11,7 @@ interface AgendarFechasModalProps {
   isOpen: boolean;
   onClose: () => void;
   hito?: HitoAvance | null;
+  selectedBeneficiaries?: number[];
   onAgendar: (payload: AgendarFechasHitoPayload) => Promise<void>;
   isLoading?: boolean;
 }
@@ -19,6 +20,7 @@ export function AgendarFechasModal({
   isOpen,
   onClose,
   hito,
+  selectedBeneficiaries = [],
   onAgendar,
   isLoading,
 }: AgendarFechasModalProps) {
@@ -58,7 +60,9 @@ export function AgendarFechasModal({
     try {
       const payload: AgendarFechasHitoPayload = {
         fechas: validFechas,
-        persona_id: hito?.persona_id || hito?.persona?.id,
+        selectedBeneficiaries: selectedBeneficiaries.length > 0 ? selectedBeneficiaries : (hito?.persona_id ? [hito.persona_id] : []),
+        beneficiarios: selectedBeneficiaries.length > 0 ? selectedBeneficiaries : (hito?.persona_id ? [hito.persona_id] : []),
+        persona_id: selectedBeneficiaries.length === 1 ? selectedBeneficiaries[0] : (hito?.persona_id || hito?.persona?.id),
         ...(hito?.id ? { hito_id: hito.id } : {}),
       };
 
@@ -82,7 +86,11 @@ export function AgendarFechasModal({
       isOpen={isOpen}
       onClose={onClose}
       title="Agendar Fechas de Sesiones del Hito"
-      description="Registra el cronograma de fechas obligatorias de asistencia para el cumplimiento del hito (POST /api/hitos/fechas)."
+      description={
+        selectedBeneficiaries.length > 1
+          ? `Agendando cronograma simultáneo para ${selectedBeneficiaries.length} beneficiarios seleccionados (POST /api/hitos/fechas).`
+          : "Registra el cronograma de fechas obligatorias de asistencia para el cumplimiento del hito (POST /api/hitos/fechas)."
+      }
       maxWidth="md"
       footer={
         <>

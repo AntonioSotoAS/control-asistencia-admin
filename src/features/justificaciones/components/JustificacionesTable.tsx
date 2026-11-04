@@ -23,6 +23,7 @@ interface JustificacionesTableProps {
   isError?: boolean;
   error?: unknown;
   onViewDetail: (item: Justificacion) => void;
+  onStatusChange?: (id: number, newStatus: string) => void;
   onRetry?: () => void;
 }
 
@@ -32,6 +33,7 @@ export function JustificacionesTable({
   isError,
   error,
   onViewDetail,
+  onStatusChange,
   onRetry,
 }: JustificacionesTableProps) {
   if (isLoading) {
@@ -179,14 +181,34 @@ export function JustificacionesTable({
               </TableCell>
 
               <TableCell className="text-right">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onViewDetail(item)}
-                  leftIcon={<Eye className="w-3.5 h-3.5" />}
-                >
-                  Detalle
-                </Button>
+                <div className="flex items-center justify-end gap-2">
+                  <select
+                    value={
+                      item.estado?.toLowerCase() === "aceptada"
+                        ? "aprobada"
+                        : item.estado?.toLowerCase().includes("revision")
+                        ? "revision"
+                        : item.estado?.toLowerCase() || "revision"
+                    }
+                    onChange={(e) => onStatusChange?.(item.id, e.target.value)}
+                    className="text-xs font-semibold bg-white border border-linea rounded-field px-2.5 py-1.5 text-carbon hover:border-guinda focus:outline-none focus:border-guinda shadow-2xs cursor-pointer transition"
+                    title="Cambiar estado de justificación"
+                  >
+                    <option value="revision">En revisión</option>
+                    <option value="aprobada">Aprobada</option>
+                    <option value="observada">Observada</option>
+                    <option value="rechazada">Rechazada</option>
+                  </select>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onViewDetail(item)}
+                    leftIcon={<Eye className="w-3.5 h-3.5" />}
+                  >
+                    Detalle
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           );

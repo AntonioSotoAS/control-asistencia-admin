@@ -26,6 +26,9 @@ import type { HitoAdmin } from "../types/hito.types";
 interface HitosAdminTableProps {
   hitos: HitoAdmin[];
   isLoading?: boolean;
+  selectedBeneficiaries?: number[];
+  onToggleSelectBeneficiary?: (id: number) => void;
+  onSelectAllBeneficiaries?: (selected: boolean) => void;
   onViewDetail: (hito: HitoAdmin) => void;
   onAgendarFechas: (hito: HitoAdmin) => void;
   onRevisar: (hito: HitoAdmin) => void;
@@ -35,6 +38,9 @@ interface HitosAdminTableProps {
 export function HitosAdminTable({
   hitos,
   isLoading,
+  selectedBeneficiaries = [],
+  onToggleSelectBeneficiary,
+  onSelectAllBeneficiaries,
   onViewDetail,
   onAgendarFechas,
   onRevisar,
@@ -101,6 +107,21 @@ export function HitosAdminTable({
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead className="w-10 text-center">
+            <input
+              type="checkbox"
+              aria-label="Seleccionar todos los beneficiarios"
+              className="w-4 h-4 rounded text-guinda focus:ring-guinda border-linea cursor-pointer align-middle"
+              checked={
+                hitos.length > 0 &&
+                hitos.every((h) => {
+                  const id = h.persona_id || h.persona?.id || h.id;
+                  return id ? selectedBeneficiaries.includes(id) : false;
+                })
+              }
+              onChange={(e) => onSelectAllBeneficiaries?.(e.target.checked)}
+            />
+          </TableHead>
           <TableHead>Beneficiario</TableHead>
           <TableHead>Expediente / Juzgado</TableHead>
           <TableHead>Fecha Hito</TableHead>
@@ -113,13 +134,30 @@ export function HitosAdminTable({
       <TableBody>
         {hitos.map((item, index) => {
           const persona = item.persona;
+          const beneficiarioId = item.persona_id || persona?.id || item.id || 0;
+          const isSelected = selectedBeneficiaries.includes(beneficiarioId);
           const hasHito = item.tiene_hito ?? Boolean(item.id);
           const total = item.sesiones_totales || item.sesiones_count || (hasHito ? 1 : 0);
           const asistidas = item.sesiones_completadas || item.asistencias_count || 0;
           const porcentaje = item.porcentaje_avance ?? 0;
 
           return (
-            <TableRow key={item.id ?? `sin-hito-${item.persona_id}-${index}`} className="hover:bg-suave/40">
+            <TableRow
+              key={item.id ?? `sin-hito-${item.persona_id}-${index}`}
+              className={isSelected ? "bg-amber-50/50 hover:bg-amber-50/80" : "hover:bg-suave/40"}
+            >
+              <TableCell className="w-10 text-center" onClick={(e) => e.stopPropagation()}>
+                <input
+                  type="checkbox"
+                  aria-label={`Seleccionar beneficiario #${beneficiarioId}`}
+                  className="w-4 h-4 rounded text-guinda focus:ring-guinda border-linea cursor-pointer align-middle"
+                  checked={isSelected}
+                  onChange={(e) => {
+                    onToggleSelectBeneficiary?.(beneficiarioId);
+                  }}
+                />
+              </TableCell>
+
               {/* Beneficiario */}
               <TableCell>
                 <div className="space-y-0.5">

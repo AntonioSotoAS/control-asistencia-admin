@@ -39,6 +39,9 @@ export function HitosPage() {
   const [estadoFilter, setEstadoFilter] = useState<"activo" | "cerrado" | "">("");
   const [incluirSinHito, setIncluirSinHito] = useState(false);
 
+  // Estado para selección múltiple de beneficiarios
+  const [selectedBeneficiaries, setSelectedBeneficiaries] = useState<number[]>([]);
+
   // Estados de modales
   const [selectedHitoDetailId, setSelectedHitoDetailId] = useState<number | null>(
     null
@@ -87,7 +90,30 @@ export function HitosPage() {
   const observados = hitos.filter((h) => h.revision === "observada").length;
   const sinHito = hitos.filter((h) => !h.tiene_hito || h.id === null).length;
 
+  const handleToggleSelectBeneficiary = (beneficiarioId: number) => {
+    if (selectedBeneficiaries.includes(beneficiarioId)) {
+      setSelectedBeneficiaries(selectedBeneficiaries.filter((id) => id !== beneficiarioId));
+    } else {
+      setSelectedBeneficiaries([...selectedBeneficiaries, beneficiarioId]);
+    }
+  };
+
+  const handleSelectAllBeneficiaries = (select: boolean) => {
+    if (select) {
+      const allIds = hitos
+        .map((h) => h.persona_id || h.persona?.id || h.id || 0)
+        .filter((id) => id > 0);
+      setSelectedBeneficiaries(Array.from(new Set(allIds)));
+    } else {
+      setSelectedBeneficiaries([]);
+    }
+  };
+
   const handleOpenAgendar = (hito: HitoAdmin) => {
+    const bId = hito.persona_id || hito.persona?.id || hito.id || 0;
+    if (bId && !selectedBeneficiaries.includes(bId)) {
+      setSelectedBeneficiaries([bId]);
+    }
     setSelectedHitoForAgendar(hito);
   };
 
@@ -102,9 +128,29 @@ export function HitosPage() {
   };
 
   const handleSaveAgendarFechas = async (payload: AgendarFechasHitoPayload) => {
-    await agendarFechas(payload).unwrap();
+    // Enviar el array de beneficiarios seleccionados hacia el endpoint en lugar del ID del primer elemento
+    const listToSend =
+      selectedBeneficiaries.length > 0
+        ? selectedBeneficiaries
+        : payload.selectedBeneficiaries && payload.selectedBeneficiaries.length > 0
+        ? payload.selectedBeneficiaries
+        : payload.persona_id
+        ? [payload.persona_id]
+        : [];
+
+    const payloadWithBeneficiaries: AgendarFechasHitoPayload = {
+      ...payload,
+      selectedBeneficiaries: listToSend,
+      beneficiarios: listToSend,
+      persona_ids: listToSend,
+    };
+
+    await agendarFechas(payloadWithBeneficiaries).unwrap();
+    setSelectedBeneficiaries([]);
     showNotification(
-      "Fechas de sesiones registradas exitosamente en el servidor (POST /api/hitos/fechas)."
+      `Fechas de sesiones registradas exitosamente para ${
+        listToSend.length > 1 ? `${listToSend.length} beneficiarios` : "el beneficiario"
+      } (POST /api/hitos/fechas).`
     );
   };
 
@@ -156,11 +202,24 @@ export function HitosPage() {
           <Button
             variant="primary"
             size="sm"
-            onClick={() => setSelectedHitoForAgendar(hitos[0] || null)}
+            onClick={() => {
+              if (selectedBeneficiaries.length === 0) {
+                if (hitos.length > 0) {
+                  const firstId = hitos[0].persona_id || hitos[0].persona?.id || hitos[0].id || 0;
+                  if (firstId) setSelectedBeneficiaries([firstId]);
+                  setSelectedHitoForAgendar(hitos[0]);
+                }
+              } else {
+                const matched = hitos.find((h) =>
+                  selectedBeneficiaries.includes(h.persona_id || h.persona?.id || h.id || 0)
+                );
+                setSelectedHitoForAgendar(matched || hitos[0] || null);
+              }
+            }}
             leftIcon={<CalendarPlus className="w-4 h-4" />}
             className="font-bold shrink-0"
           >
-            Agendar Fechas
+            Agendar Fechas{selectedBeneficiaries.length > 0 ? ` (${selectedBeneficiaries.length})` : ""}
           </Button>
         </div>
       </div>
@@ -314,6 +373,9 @@ export function HitosPage() {
         <HitosAdminTable
           hitos={hitos}
           isLoading={isLoading}
+          selectedBeneficiaries={selectedBeneficiaries}
+          onToggleSelectBeneficiary={handleToggleSelectBeneficiary}
+          onSelectAllBeneficiaries={handleSelectAllBeneficiaries}
           onViewDetail={handleViewDetail}
           onAgendarFechas={handleOpenAgendar}
           onRevisar={handleOpenRevisar}
@@ -335,6 +397,7 @@ export function HitosPage() {
         isOpen={Boolean(selectedHitoForAgendar)}
         onClose={() => setSelectedHitoForAgendar(null)}
         hito={selectedHitoForAgendar}
+        selectedBeneficiaries={selectedBeneficiaries}
         onAgendar={handleSaveAgendarFechas}
         isLoading={isAgendando}
       />

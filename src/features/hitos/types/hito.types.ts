@@ -86,6 +86,9 @@ export interface ListarHitosAdminParams {
 export interface AgendarFechasHitoPayload {
   fechas: string[];
   persona_id?: number;
+  persona_ids?: number[];
+  beneficiarios?: number[];
+  selectedBeneficiaries?: number[];
   hito_id?: number;
   [key: string]: unknown;
 }
