@@ -18,7 +18,7 @@ export function Badge({
     danger: "bg-rose-50 text-rose-800 border-rose-200",
     info: "bg-sky-50 text-sky-800 border-sky-200",
     olivo: "bg-[#f4f3ed] text-olivo border-[#dedcd2]",
-    guinda: "bg-[#fcf1f1] text-guinda border-[#f4cfcf]",
+    guinda: "bg-[#f4eefb] text-guinda border-[#dfd0f5]",
     purple: "bg-purple-50 text-purple-800 border-purple-200",
   };
 

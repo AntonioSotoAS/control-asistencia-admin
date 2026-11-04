@@ -1,8 +1,12 @@
 @theme inline {
-  --color-guinda: #800000;
-  --color-guinda-dark: #660000;
-  --color-guinda-light: #990000;
-  --color-guinda-soft: #fcf1f1;
+  --color-guinda: #562599;
+  --color-guinda-dark: #431c79;
+  --color-guinda-light: #6d35be;
+  --color-guinda-soft: #f4eefb;
+  --color-morado: #562599;
+  --color-morado-dark: #431c79;
+  --color-morado-light: #6d35be;
+  --color-morado-soft: #f4eefb;
   --color-olivo: #6E6A59;
   --color-olivo-dark: #585547;
   --color-olivo-soft: #f4f3ed;
@@ -20,7 +24,7 @@
 }
 
 :root {
-  --primary: #800000;
+  --primary: #562599;
   --primary-foreground: #ffffff;
   --secondary: #6E6A59;
   --secondary-foreground: #ffffff;
@@ -32,5 +36,5 @@
   --background: #242424;
   --card: #2E2E2E;
   --foreground: #ffffff;
-  --primary: #800000;
+  --primary: #562599;
 }

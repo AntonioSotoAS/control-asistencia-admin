@@ -72,7 +72,7 @@ export function AttendanceChart({ data }: AttendanceChartProps) {
             <Bar
               dataKey="presentes"
               name="Presentes"
-              fill="#800000"
+              fill="#562599"
               radius={[6, 6, 0, 0]}
             />
             <Bar

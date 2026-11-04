@@ -101,14 +101,14 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen h-screen flex flex-col lg:flex-row overflow-hidden bg-white selection:bg-[#73101a] selection:text-white">
+    <div className="min-h-screen h-screen flex flex-col lg:flex-row overflow-hidden bg-white selection:bg-[#562599] selection:text-white">
       {/* Left Column: Form & Branding */}
       <div className="w-full lg:w-[44%] xl:w-[40%] 2xl:w-[36%] shrink-0 h-full flex flex-col justify-between px-6 sm:px-12 lg:px-10 xl:px-14 py-6 sm:py-8 relative z-10 bg-white overflow-y-auto">
         {/* Top-left decorative curved accent */}
         <div className="absolute top-0 left-0 w-28 h-36 sm:w-36 sm:h-48 pointer-events-none select-none z-0">
           <svg
             viewBox="0 0 160 220"
-            className="w-full h-full text-[#73101a] fill-current"
+            className="w-full h-full text-[#562599] fill-current"
             preserveAspectRatio="none"
           >
             <path d="M0,0 L130,0 C100,55 45,140 0,200 Z" />
@@ -169,7 +169,7 @@ export function LoginPage() {
                   onChange={(e) => setIdentificador(e.target.value)}
                   autoComplete="username"
                   required
-                  className="w-full pl-12 pr-4 py-3 sm:py-3.5 rounded-2xl border border-slate-200 bg-[#f8fafc]/50 focus:bg-white text-slate-800 placeholder:text-slate-400 text-sm font-medium focus:outline-none focus:border-[#73101a] focus:ring-4 focus:ring-[#73101a]/10 transition-all shadow-sm"
+                  className="w-full pl-12 pr-4 py-3 sm:py-3.5 rounded-2xl border border-slate-200 bg-[#f8fafc]/50 focus:bg-white text-slate-800 placeholder:text-slate-400 text-sm font-medium focus:outline-none focus:border-[#562599] focus:ring-4 focus:ring-[#562599]/15 transition-all shadow-sm"
                 />
               </div>
             </div>
@@ -187,7 +187,7 @@ export function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
                   required
-                  className="w-full pl-12 pr-12 py-3 sm:py-3.5 rounded-2xl border border-slate-200 bg-[#f8fafc]/50 focus:bg-white text-slate-800 placeholder:text-slate-400 text-sm font-medium focus:outline-none focus:border-[#73101a] focus:ring-4 focus:ring-[#73101a]/10 transition-all shadow-sm"
+                  className="w-full pl-12 pr-12 py-3 sm:py-3.5 rounded-2xl border border-slate-200 bg-[#f8fafc]/50 focus:bg-white text-slate-800 placeholder:text-slate-400 text-sm font-medium focus:outline-none focus:border-[#562599] focus:ring-4 focus:ring-[#562599]/15 transition-all shadow-sm"
                 />
                 <button
                   type="button"
@@ -208,7 +208,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3.5 px-6 rounded-2xl bg-[#73101a] hover:bg-[#5e0c15] active:bg-[#4d0911] text-white font-bold text-sm sm:text-base tracking-wide shadow-md shadow-[#73101a]/20 hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed mt-3"
+              className="w-full py-3.5 px-6 rounded-2xl bg-[#562599] hover:bg-[#471e80] active:bg-[#3a1869] text-white font-bold text-sm sm:text-base tracking-wide shadow-md shadow-[#562599]/25 hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed mt-3"
             >
               {isLoading ? (
                 <>

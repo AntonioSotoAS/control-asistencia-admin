@@ -40,7 +40,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        "bg-guinda text-white hover:bg-[#6a0000] shadow-sm hover:shadow active:bg-[#550000]",
+        "bg-guinda text-white hover:bg-[#471e80] shadow-sm hover:shadow active:bg-[#3a1869]",
       secondary:
         "bg-olivo text-white hover:bg-[#5d594b] shadow-sm active:bg-[#4d4a3e]",
       outline:
