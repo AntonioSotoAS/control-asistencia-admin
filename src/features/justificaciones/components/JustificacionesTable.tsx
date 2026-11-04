@@ -187,8 +187,8 @@ export function JustificacionesTable({
                       item.estado?.toLowerCase() === "aceptada"
                         ? "aprobada"
                         : item.estado?.toLowerCase().includes("revision")
-                        ? "revision"
-                        : item.estado?.toLowerCase() || "revision"
+                          ? "revision"
+                          : item.estado?.toLowerCase() || "revision"
                     }
                     onChange={(e) => onStatusChange?.(item.id, e.target.value)}
                     className="text-xs font-semibold bg-white border border-linea rounded-field px-2.5 py-1.5 text-carbon hover:border-guinda focus:outline-none focus:border-guinda shadow-2xs cursor-pointer transition"

@@ -185,3 +185,4 @@ export function FaqsPage() {
 }
 
 export default FaqsPage;
+

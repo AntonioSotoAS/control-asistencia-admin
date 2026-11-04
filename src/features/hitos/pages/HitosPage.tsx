@@ -133,10 +133,10 @@ export function HitosPage() {
       selectedBeneficiaries.length > 0
         ? selectedBeneficiaries
         : payload.selectedBeneficiaries && payload.selectedBeneficiaries.length > 0
-        ? payload.selectedBeneficiaries
-        : payload.persona_id
-        ? [payload.persona_id]
-        : [];
+          ? payload.selectedBeneficiaries
+          : payload.persona_id
+            ? [payload.persona_id]
+            : [];
 
     const payloadWithBeneficiaries: AgendarFechasHitoPayload = {
       ...payload,
@@ -148,9 +148,8 @@ export function HitosPage() {
     await agendarFechas(payloadWithBeneficiaries).unwrap();
     setSelectedBeneficiaries([]);
     showNotification(
-      `Fechas de sesiones registradas exitosamente para ${
-        listToSend.length > 1 ? `${listToSend.length} beneficiarios` : "el beneficiario"
-      } (POST /api/hitos/fechas).`
+        `Fechas de sesiones registradas exitosamente para ${listToSend.length > 1 ? `${listToSend.length} beneficiarios` : "el beneficiario"
+        } (POST /api/hitos/fechas).`
     );
   };
 

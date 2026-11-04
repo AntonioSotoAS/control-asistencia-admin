@@ -130,80 +130,82 @@ export function UsuariosTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {sortedUsers.map((u) => {
-          const personaNombre =
-            u.persona?.nombres && u.persona?.apellidos
-              ? `${u.persona.nombres} ${u.persona.apellidos}`
-              : u.nombre || "Persona no vinculada";
+          {
+            sortedUsers.map((u) => {
+              const personaNombre =
+                u.persona?.nombres && u.persona?.apellidos
+                  ? `${u.persona.nombres} ${u.persona.apellidos}`
+                  : u.nombre || "Persona no vinculada";
 
-          return (
-            <TableRow key={u.id}>
-              <TableCell className="font-mono text-xs text-olivo">
-                #{u.id}
-              </TableCell>
+              return (
+                <TableRow key={u.id}>
+                  <TableCell className="font-mono text-xs text-olivo">
+                    #{u.id}
+                  </TableCell>
 
-              <TableCell>
-                <span className="font-mono font-bold text-carbon bg-suave/80 px-2.5 py-1 rounded-md text-xs border border-linea/60">
-                  {u.identificador}
-                </span>
-              </TableCell>
+                  <TableCell>
+                    <span className="font-mono font-bold text-carbon bg-suave/80 px-2.5 py-1 rounded-md text-xs border border-linea/60">
+                      {u.identificador}
+                    </span>
+                  </TableCell>
 
-              <TableCell>
-                <div className="flex flex-col">
-                  <span className="font-bold text-carbon">{personaNombre}</span>
-                  <span className="text-[11px] text-olivo">
-                    ID Persona: #{u.persona_id}
-                    {u.persona?.dni ? ` • DNI: ${u.persona.dni}` : ""}
-                    {u.persona?.expediente ? ` • Exp: ${u.persona.expediente}` : ""}
-                  </span>
-                </div>
-              </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <span className="font-bold text-carbon">{personaNombre}</span>
+                      <span className="text-[11px] text-olivo">
+                        ID Persona: #{u.persona_id}
+                        {u.persona?.dni ? ` • DNI: ${u.persona.dni}` : ""}
+                        {u.persona?.expediente ? ` • Exp: ${u.persona.expediente}` : ""}
+                      </span>
+                    </div>
+                  </TableCell>
 
-              <TableCell>{getRoleBadge(u.rol)}</TableCell>
+                  <TableCell>{getRoleBadge(u.rol)}</TableCell>
 
-              <TableCell>
-                <Badge variant={u.estado === "activo" ? "success" : "danger"}>
-                  {u.estado === "activo" ? "Activo" : "Inactivo"}
-                </Badge>
-              </TableCell>
+                  <TableCell>
+                    <Badge variant={u.estado === "activo" ? "success" : "danger"}>
+                      {u.estado === "activo" ? "Activo" : "Inactivo"}
+                    </Badge>
+                  </TableCell>
 
-              <TableCell>
-                <span className="text-xs text-olivo">
-                  {u.created_at
-                    ? new Date(u.created_at).toLocaleDateString("es-PE", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })
-                    : "—"}
-                </span>
-              </TableCell>
+                  <TableCell>
+                    <span className="text-xs text-olivo">
+                      {u.created_at
+                        ? new Date(u.created_at).toLocaleDateString("es-PE", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })
+                        : "—"}
+                    </span>
+                  </TableCell>
 
-              <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onEdit(u)}
-                    className="p-1.5 h-8 w-8 text-olivo hover:text-guinda"
-                    title="Editar cuenta"
-                  >
-                    <Edit2 className="w-3.5 h-3.5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onDelete(u)}
-                    className="p-1.5 h-8 w-8 text-olivo hover:text-red-700"
-                    title="Eliminar cuenta"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          );
-        })}
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEdit(u)}
+                        className="p-1.5 h-8 w-8 text-olivo hover:text-guinda"
+                        title="Editar cuenta"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onDelete(u)}
+                        className="p-1.5 h-8 w-8 text-olivo hover:text-red-700"
+                        title="Eliminar cuenta"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })
+          }
       </TableBody>
     </Table>
   );

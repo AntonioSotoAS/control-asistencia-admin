@@ -32,10 +32,10 @@ export function DetalleJustificacionModal({
   const badgeVariant = isApproved
     ? "success"
     : isRejected
-    ? "danger"
-    : isEnRevision
-    ? "info"
-    : "warning";
+      ? "danger"
+      : isEnRevision
+        ? "info"
+        : "warning";
 
   const fileUrl = justificacion.sustentoDocUrl || justificacion.archivo_url || justificacion.archivo;
 
@@ -73,8 +73,8 @@ export function DetalleJustificacionModal({
                     justificacion.estado?.toLowerCase() === "aceptada"
                       ? "aprobada"
                       : justificacion.estado?.toLowerCase().includes("revision")
-                      ? "revision"
-                      : justificacion.estado?.toLowerCase() || "revision"
+                        ? "revision"
+                        : justificacion.estado?.toLowerCase() || "revision"
                   }
                   onChange={(e) => onStatusChange(justificacion.id, e.target.value)}
                   className="text-xs font-semibold bg-white border border-linea rounded-field px-2 py-1 text-carbon hover:border-guinda focus:outline-none focus:border-guinda shadow-2xs cursor-pointer"

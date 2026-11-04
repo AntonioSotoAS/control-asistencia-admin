@@ -31,3 +31,4 @@ export interface ApiErrorResponse {
   mensaje?: string;
   errors?: Record<string, string[]>;
 }
+

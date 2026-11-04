@@ -4,3 +4,4 @@ export * from "./components/FaqsTable";
 export * from "./components/FaqModal";
 export * from "./components/EliminarFaqModal";
 export * from "./pages/FaqsPage";
+
