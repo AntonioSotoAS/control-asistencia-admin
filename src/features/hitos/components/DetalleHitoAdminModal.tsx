@@ -110,7 +110,7 @@ export function DetalleHitoAdminModal({
 
             {hito && onGenerarReporte && (
               <Button
-                variant="default"
+                variant="primary"
                 size="sm"
                 onClick={() => {
                   onClose();

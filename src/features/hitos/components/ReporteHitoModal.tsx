@@ -1,17 +1,14 @@
 import { useRef } from "react";
-import { Modal, Button, Badge } from "@/components/ui";
+import { Modal, Button } from "@/components/ui";
 import {
   Printer,
-  FileText,
   CheckCircle2,
   AlertTriangle,
   Clock,
   Building2,
   Calendar,
   User,
-  ShieldCheck,
   Loader2,
-  Download,
 } from "lucide-react";
 import { useGetHitoAdminByIdQuery } from "../services/hitosApi";
 import type { HitoAdmin } from "../types/hito.types";
@@ -301,7 +298,7 @@ export function ReporteHitoModal({
               Cerrar
             </Button>
             <Button
-              variant="default"
+              variant="primary"
               size="sm"
               onClick={handlePrint}
               leftIcon={<Printer className="w-4 h-4 text-white" />}
@@ -405,7 +402,7 @@ export function ReporteHitoModal({
               <div className="p-3 rounded-lg bg-surface-muted/40 border border-border-soft">
                 <span className="info-label text-[10px] text-ink-secondary font-bold uppercase block">Hito Procesal:</span>
                 <span className="info-value font-bold text-ink-primary text-sm block mt-0.5">
-                  {hito.nombre || hito.titulo || `Hito #${hito.id}`}
+                  {hito.nombre || `Hito #${hito.id}`}
                 </span>
                 <span className="text-[11px] text-ink-secondary mt-1 block">
                   Fecha Límite: {hito.fecha ? hito.fecha.split("T")[0] : "—"}
