@@ -15,17 +15,17 @@ interface AttendanceChartProps {
   data?: TendenciaAsistencia[];
 }
 
-const defaultData: TendenciaAsistencia[] = [
-  { dia: "Lun", presentes: 420, tardanzas: 25, faltas: 15 },
-  { dia: "Mar", presentes: 440, tardanzas: 18, faltas: 12 },
-  { dia: "Mié", presentes: 435, tardanzas: 22, faltas: 13 },
-  { dia: "Jue", presentes: 450, tardanzas: 15, faltas: 5 },
-  { dia: "Vie", presentes: 439, tardanzas: 21, faltas: 10 },
-  { dia: "Sáb", presentes: 410, tardanzas: 30, faltas: 20 },
+const emptyWeekData: TendenciaAsistencia[] = [
+  { dia: "Lun", presentes: 0, tardanzas: 0, faltas: 0 },
+  { dia: "Mar", presentes: 0, tardanzas: 0, faltas: 0 },
+  { dia: "Mié", presentes: 0, tardanzas: 0, faltas: 0 },
+  { dia: "Jue", presentes: 0, tardanzas: 0, faltas: 0 },
+  { dia: "Vie", presentes: 0, tardanzas: 0, faltas: 0 },
+  { dia: "Sáb", presentes: 0, tardanzas: 0, faltas: 0 },
 ];
 
 export function AttendanceChart({ data }: AttendanceChartProps) {
-  const chartData = data && data.length > 0 ? data : defaultData;
+  const chartData = data && data.length > 0 ? data : emptyWeekData;
 
   return (
     <Card className="h-full flex flex-col">

@@ -10,14 +10,21 @@ import type { DashboardKPIS } from "../types/dashboard.types";
 
 interface StatsOverviewProps {
   kpis?: DashboardKPIS;
+  metrics?: Record<string, any> | null;
   isLoading?: boolean;
 }
 
-export function StatsOverview({ kpis }: StatsOverviewProps) {
+export function StatsOverview({ kpis, metrics }: StatsOverviewProps) {
+  const faltasVal = metrics?.total_faltas ?? metrics?.faltas ?? kpis?.totalFaltas ?? 0;
+  const tardanzasVal = metrics?.total_tardanzas ?? metrics?.tardanzas ?? kpis?.totalTardanzas ?? 0;
+  const justificacionesVal = metrics?.justificaciones_pendientes ?? metrics?.justificaciones ?? kpis?.justificacionesPendientes ?? 0;
+  const beneficiariosVal = metrics?.beneficiarios ?? metrics?.total_beneficiarios ?? kpis?.totalBeneficiarios ?? 0;
+  const totalUsersVal = metrics?.total_users ?? metrics?.totalUsuarios;
+
   const cards = [
     {
       title: "Inasistencias (Faltas)",
-      value: kpis?.totalFaltas ?? 0,
+      value: faltasVal,
       change: "Requieren llamada urgente",
       icon: AlertOctagon,
       color: "bg-rose-700 text-white",
@@ -25,7 +32,7 @@ export function StatsOverview({ kpis }: StatsOverviewProps) {
     },
     {
       title: "Tardanzas Reportadas",
-      value: kpis?.totalTardanzas ?? 0,
+      value: tardanzasVal,
       change: "Ingresos fuera de hora",
       icon: Clock,
       color: "bg-amber-600 text-white",
@@ -33,16 +40,16 @@ export function StatsOverview({ kpis }: StatsOverviewProps) {
     },
     {
       title: "Justificaciones en Trámite",
-      value: kpis?.justificacionesPendientes ?? 0,
+      value: justificacionesVal,
       change: "Pendientes de revisión",
       icon: AlertTriangle,
       color: "bg-guinda text-white",
       bgSubtle: "bg-guinda/10 text-guinda border border-guinda/20",
     },
     {
-      title: "Beneficiarios en Padrón",
-      value: kpis?.totalBeneficiarios ?? 0,
-      change: "Padrón institucional activo",
+      title: totalUsersVal !== undefined ? "Beneficiarios / Usuarios" : "Beneficiarios en Padrón",
+      value: totalUsersVal !== undefined ? `${beneficiariosVal} / ${totalUsersVal}` : beneficiariosVal,
+      change: totalUsersVal !== undefined ? "Padrón activo / Cuentas totales" : "Padrón institucional activo",
       icon: Users,
       color: "bg-emerald-700 text-white",
       bgSubtle: "bg-emerald-50 text-emerald-800 border border-emerald-200",

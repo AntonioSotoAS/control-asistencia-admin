@@ -13,12 +13,14 @@ interface DetalleJustificacionModalProps {
   isOpen: boolean;
   onClose: () => void;
   justificacion: Justificacion | null;
+  onStatusChange?: (id: number, newStatus: string) => void;
 }
 
 export function DetalleJustificacionModal({
   isOpen,
   onClose,
   justificacion,
+  onStatusChange,
 }: DetalleJustificacionModalProps) {
   if (!justificacion) return null;
 
@@ -64,9 +66,29 @@ export function DetalleJustificacionModal({
               </span>
             </div>
 
-            <Badge variant={badgeVariant}>
-              {justificacion.estado || "ENVIADA"}
-            </Badge>
+            <div className="flex items-center gap-2">
+              {onStatusChange && (
+                <select
+                  value={
+                    justificacion.estado?.toLowerCase() === "aceptada"
+                      ? "aprobada"
+                      : justificacion.estado?.toLowerCase().includes("revision")
+                      ? "revision"
+                      : justificacion.estado?.toLowerCase() || "revision"
+                  }
+                  onChange={(e) => onStatusChange(justificacion.id, e.target.value)}
+                  className="text-xs font-semibold bg-white border border-linea rounded-field px-2 py-1 text-carbon hover:border-guinda focus:outline-none focus:border-guinda shadow-2xs cursor-pointer"
+                >
+                  <option value="revision">En revisión</option>
+                  <option value="aprobada">Aprobada</option>
+                  <option value="observada">Observada</option>
+                  <option value="rechazada">Rechazada</option>
+                </select>
+              )}
+              <Badge variant={badgeVariant}>
+                {justificacion.estado || "ENVIADA"}
+              </Badge>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-carbon">

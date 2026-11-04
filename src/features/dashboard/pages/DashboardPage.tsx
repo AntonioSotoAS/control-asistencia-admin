@@ -1,8 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import axios from "axios";
 import { StatsOverview } from "../components/StatsOverview";
 import { MonitorInasistencias } from "../components/MonitorInasistencias";
 import { FichaContactoModal } from "../components/FichaContactoModal";
 import { QuickActions } from "../components/QuickActions";
+import { AttendanceChart } from "../components/AttendanceChart";
+import { RecentActivityList } from "../components/RecentActivityList";
 import { JustificacionModal } from "@/features/justificaciones/components/JustificacionModal";
 import { Button } from "@/components/ui";
 import { RefreshCw, CheckCircle2, PhoneCall, ShieldAlert } from "lucide-react";
@@ -16,6 +19,8 @@ import { useGetHitosQuery } from "@/features/hitos/services/hitosApi";
 import type {
   AlertaInasistencia,
   DashboardKPIS,
+  TendenciaAsistencia,
+  ActividadReciente,
 } from "../types/dashboard.types";
 import type { RegistrarJustificacionPayload } from "@/features/justificaciones/types/justificacion.types";
 import type { Persona } from "@/features/personas/types/persona.types";
@@ -29,6 +34,27 @@ export function DashboardPage() {
     useState<AlertaInasistencia | null>(null);
 
   const [notification, setNotification] = useState<string | null>(null);
+
+  // Estado para métricas reales del dashboard
+  const [metrics, setMetrics] = useState<any>(null);
+
+  const fetchStats = () => {
+    const token = sessionStorage.getItem("token");
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+    axios
+      .get("/api/dashboard/stats", { headers })
+      .then((res) => {
+        setMetrics(res.data?.data || res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
 
   // Consultas directas a las APIs reales
   const {
@@ -65,6 +91,7 @@ export function DashboardPage() {
   };
 
   const handleRefreshAll = () => {
+    fetchStats();
     refetchSesiones();
     refetchPersonas();
     refetchJustificaciones();
@@ -204,6 +231,78 @@ export function DashboardPage() {
     };
   }, [alertasInasistencias, justificaciones, personas, sesiones]);
 
+  // Tendencia de asistencia real agrupada por día de la semana
+  const tendenciaReal = useMemo<TendenciaAsistencia[]>(() => {
+    if (metrics?.tendencia && Array.isArray(metrics.tendencia)) {
+      return metrics.tendencia;
+    }
+
+    const diasSemana: { [key: number]: string } = {
+      1: "Lun",
+      2: "Mar",
+      3: "Mié",
+      4: "Jue",
+      5: "Vie",
+      6: "Sáb",
+    };
+
+    const conteoPorDia: { [key: string]: { presentes: number; tardanzas: number; faltas: number } } = {
+      Lun: { presentes: 0, tardanzas: 0, faltas: 0 },
+      Mar: { presentes: 0, tardanzas: 0, faltas: 0 },
+      Mié: { presentes: 0, tardanzas: 0, faltas: 0 },
+      Jue: { presentes: 0, tardanzas: 0, faltas: 0 },
+      Vie: { presentes: 0, tardanzas: 0, faltas: 0 },
+      Sáb: { presentes: 0, tardanzas: 0, faltas: 0 },
+    };
+
+    sesiones.forEach((s) => {
+      if (!s.fecha) return;
+      const d = new Date(s.fecha + "T00:00:00");
+      const diaNum = d.getDay();
+      const diaNombre = diasSemana[diaNum];
+      if (!diaNombre) return;
+
+      const estado = (s.estado || "").toUpperCase();
+      if (estado.includes("TARDANZA")) {
+        conteoPorDia[diaNombre].tardanzas += 1;
+      } else if (estado.includes("FALTA") || estado.includes("AUSENTE")) {
+        conteoPorDia[diaNombre].faltas += 1;
+      } else {
+        conteoPorDia[diaNombre].presentes += 1;
+      }
+    });
+
+    return Object.entries(conteoPorDia).map(([dia, vals]) => ({
+      dia,
+      ...vals,
+    }));
+  }, [metrics, sesiones]);
+
+  // Actividad reciente calculada con sesiones reales
+  const actividadRecienteReal = useMemo<ActividadReciente[]>(() => {
+    if (metrics?.actividad_reciente && Array.isArray(metrics.actividad_reciente)) {
+      return metrics.actividad_reciente;
+    }
+
+    return sesiones.slice(0, 5).map((s) => {
+      const p = s.persona_id ? personasMapById.get(s.persona_id) : undefined;
+      const rawEstado = (s.estado || "PRESENTE").toUpperCase();
+      let estado: ActividadReciente["estado"] = "PRESENTE";
+      if (rawEstado.includes("TARDANZA")) estado = "TARDANZA";
+      else if (rawEstado.includes("FALTA") || rawEstado.includes("AUSENTE")) estado = "FALTA";
+      else if (rawEstado.includes("JUSTIF")) estado = "JUSTIFICADO";
+
+      return {
+        id: String(s.id),
+        beneficiario: p?.nombre || s.beneficiarioNombre || `Beneficiario #${s.persona_id || s.id}`,
+        dni: p?.dni || s.beneficiarioDni || "—",
+        hito: s.hitoNombre || (s.hito_id ? `Hito #${s.hito_id}` : "Sesión de Control"),
+        hora: s.hora || (s.fecha ? s.fecha : "09:00 AM"),
+        estado,
+      };
+    });
+  }, [metrics, sesiones, personasMapById]);
+
   const handleOpenJustificacion = (alerta: AlertaInasistencia) => {
     setSelectedAlertaForJustificacion(alerta);
   };
@@ -286,8 +385,18 @@ export function DashboardPage() {
         </div>
       )}
 
-      {/* KPIs Operativos */}
-      <StatsOverview kpis={kpis} isLoading={isLoadingSesiones} />
+      {/* KPIs Operativos con datos del backend */}
+      <StatsOverview kpis={kpis} metrics={metrics} isLoading={isLoadingSesiones} />
+
+      {/* Gráficos de Asistencia y Actividad Reciente */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <AttendanceChart data={tendenciaReal} />
+        </div>
+        <div className="lg:col-span-1">
+          <RecentActivityList data={actividadRecienteReal} />
+        </div>
+      </div>
 
       {/* MONITOR PRINCIPAL: Inasistencias y Tardanzas con Nombre y Teléfono */}
       <MonitorInasistencias

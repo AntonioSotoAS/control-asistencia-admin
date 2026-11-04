@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import axios from "axios";
 import { JustificacionesTable } from "../components/JustificacionesTable";
 import { JustificacionModal } from "../components/JustificacionModal";
 import { DetalleJustificacionModal } from "../components/DetalleJustificacionModal";
@@ -131,6 +132,56 @@ export function JustificacionesPage() {
     showNotification("Justificación de inasistencia registrada correctamente.");
   };
 
+  const handleStatusChange = async (id: number, newStatus: string) => {
+    // Mapeo al estándar del backend
+    const backendStatus =
+      newStatus === "revision"
+        ? "en_revision"
+        : newStatus === "aprobada"
+        ? "aceptada"
+        : newStatus;
+
+    const token = sessionStorage.getItem("token");
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+    try {
+      // 1. Endpoint REST del backend: PUT /api/justificaciones/{id}/estado
+      // 2. Si no responde, fallback a PATCH /api/justificaciones/{id}
+      try {
+        await axios.put(
+          `/api/justificaciones/${id}/estado`,
+          { estado: backendStatus },
+          { headers }
+        );
+      } catch {
+        await axios.patch(
+          `/api/justificaciones/${id}`,
+          { estado: newStatus },
+          { headers }
+        );
+      }
+
+      // Actualizar el estado local en la tabla
+      refetch();
+      if (selectedJustificacion && selectedJustificacion.id === id) {
+        setSelectedJustificacion({
+          ...selectedJustificacion,
+          estado: newStatus.toUpperCase(),
+        });
+      }
+      showNotification(`Estado de la justificación #${id} actualizado a "${newStatus}".`);
+    } catch (err: unknown) {
+      console.error(err);
+      const e = err as { response?: { data?: { message?: string; mensaje?: string } } };
+      const msg =
+        e.response?.data?.message ||
+        e.response?.data?.mensaje ||
+        "No se pudo actualizar el estado de la justificación.";
+      showNotification(`Aviso: ${msg}`);
+      refetch();
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Notificación de éxito */}
@@ -222,6 +273,7 @@ export function JustificacionesPage() {
         isError={isError}
         error={error}
         onViewDetail={(item) => setSelectedJustificacion(item)}
+        onStatusChange={handleStatusChange}
         onRetry={() => refetch()}
       />
 
@@ -238,6 +290,7 @@ export function JustificacionesPage() {
         isOpen={Boolean(selectedJustificacion)}
         onClose={() => setSelectedJustificacion(null)}
         justificacion={selectedJustificacion}
+        onStatusChange={handleStatusChange}
       />
     </div>
   );
