@@ -64,6 +64,10 @@ const routeTitles: Record<string, { title: string; subtitle: string }> = {
     title: "Catálogo de Pantallas y Permisos por Rol",
     subtitle: "Gestión de módulos visibles y control de acceso por rol",
   },
+  "/faqs": {
+    title: "Preguntas Frecuentes (FAQs)",
+    subtitle: "Gestión del catálogo de preguntas y respuestas del asistente virtual",
+  },
 };
 
 export function AppHeader({ onToggleSidebar }: AppHeaderProps) {
