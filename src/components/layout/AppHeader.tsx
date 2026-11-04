@@ -4,7 +4,6 @@ import {
   Menu,
   Search,
   Bell,
-  Radio,
   X,
   ArrowRight,
   Download,
@@ -13,7 +12,6 @@ import { Badge } from "@/components/ui";
 import { useAppSelector, useAppDispatch } from "@/app/hooks";
 import { setUser } from "@/features/auth/services/authSlice";
 import {
-  useCheckHealthQuery,
   useGetPerfilQuery,
 } from "@/features/auth/services/authApi";
 import { useGetBeneficiariosQuery } from "@/features/beneficiarios/services/beneficiariosApi";
@@ -142,13 +140,6 @@ export function AppHeader({ onToggleSidebar }: AppHeaderProps) {
     navigate(`/beneficiarios?q=${encodeURIComponent(searchQuery.trim())}`);
   };
 
-  const { data: healthData, isError: isHealthError } = useCheckHealthQuery(
-    undefined,
-    {
-      pollingInterval: 30000,
-    }
-  );
-
   const dispatch = useAppDispatch();
   const { data: perfilData } = useGetPerfilQuery(undefined, {
     skip: !authUser,
@@ -175,10 +166,6 @@ export function AppHeader({ onToggleSidebar }: AppHeaderProps) {
       }
     }
   }, [perfilData, authUser, dispatch]);
-
-  const isApiOnline =
-    !isHealthError &&
-    Boolean(healthData?.success || healthData?.data?.estado === "ok");
 
   const displayName = perfilData?.nombre || authUser?.nombre || "Administrador";
 
@@ -333,31 +320,6 @@ export function AppHeader({ onToggleSidebar }: AppHeaderProps) {
             <span className="hidden md:inline">Instalar App</span>
           </button>
         )}
-
-        {/* Real API connection indicator */}
-        <div
-          className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold ${
-            isApiOnline
-              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-              : "bg-rose-50 border-rose-200 text-rose-800"
-          }`}
-          title={
-            isApiOnline
-              ? "Servicio backend respondiendo OK (/api/health)"
-              : "Sin conexión al servicio backend (/api/health)"
-          }
-        >
-          <Radio
-            className={`w-3.5 h-3.5 ${
-              isApiOnline
-                ? "text-emerald-600 animate-pulse"
-                : "text-rose-600"
-            }`}
-          />
-          <span className="text-[11px]">
-            {isApiOnline ? "API Conectada" : "API Desconectada"}
-          </span>
-        </div>
 
         {/* Date Pill */}
         <Badge variant="olivo" className="hidden lg:inline-flex capitalize">
