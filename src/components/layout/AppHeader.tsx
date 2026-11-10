@@ -42,6 +42,10 @@ const routeTitles: Record<string, { title: string; subtitle: string }> = {
     title: "Bandeja de Justificaciones",
     subtitle: "Revisión de solicitudes médicas y permisos",
   },
+  "/actos-procesales": {
+    title: "Actos Procesales",
+    subtitle: "Consulta de resoluciones judiciales y registro unificado de partes",
+  },
   "/reportes": {
     title: "Métricas y Reportes",
     subtitle: "Exportación consolidada e indicadores clave",

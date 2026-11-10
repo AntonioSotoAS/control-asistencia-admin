@@ -62,3 +62,4 @@ export interface SatisfaccionListResponse {
   total: number;
   personas: SatisfaccionPersonaItem[];
 }
+

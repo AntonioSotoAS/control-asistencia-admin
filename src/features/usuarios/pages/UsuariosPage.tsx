@@ -2,6 +2,7 @@ import { useState } from "react";
 import { UsuariosTable } from "../components/UsuariosTable";
 import { UsuarioModal } from "../components/UsuarioModal";
 import { EliminarUsuarioModal } from "../components/EliminarUsuarioModal";
+import { PersonaUsuarioModal } from "@/features/personas/components/PersonaUsuarioModal";
 import { Button } from "@/components/ui";
 import { UserPlus, Search, RefreshCw, CheckCircle2 } from "lucide-react";
 import { useDebounce } from "@/shared/hooks/useDebounce";
@@ -22,6 +23,7 @@ export function UsuariosPage() {
   const debouncedQuery = useDebounce(searchQuery, 400);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUnifiedModalOpen, setIsUnifiedModalOpen] = useState(false);
   const [editingUsuario, setEditingUsuario] = useState<Usuario | null>(null);
   const [deletingUsuario, setDeletingUsuario] = useState<Usuario | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
@@ -48,8 +50,7 @@ export function UsuariosPage() {
   };
 
   const handleOpenCreate = () => {
-    setEditingUsuario(null);
-    setIsModalOpen(true);
+    setIsUnifiedModalOpen(true);
   };
 
   const handleEdit = (user: Usuario) => {
@@ -126,9 +127,9 @@ export function UsuariosPage() {
               variant="primary"
               onClick={handleOpenCreate}
               leftIcon={<UserPlus className="w-4 h-4" />}
-              className="font-bold shrink-0"
+              className="bg-[#562599] hover:bg-[#471e7f] text-white font-bold shrink-0"
             >
-              Crear Cuenta
+              Registrar Persona y Cuenta
             </Button>
           </div>
         </div>
@@ -145,7 +146,17 @@ export function UsuariosPage() {
         onRetry={() => refetch()}
       />
 
-      {/* Modal para Crear o Editar */}
+      {/* Modal Unificado Registrar Persona y Cuenta */}
+      <PersonaUsuarioModal
+        isOpen={isUnifiedModalOpen}
+        onClose={() => setIsUnifiedModalOpen(false)}
+        onSuccess={(msg) => {
+          showNotification(msg);
+          refetch();
+        }}
+      />
+
+      {/* Modal para Editar Usuario existente */}
       <UsuarioModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

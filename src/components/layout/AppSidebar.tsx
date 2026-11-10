@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   SlidersHorizontal,
   HelpCircle,
+  Scale,
   LogOut,
   X,
 } from "lucide-react";
@@ -43,6 +44,7 @@ const navItems: NavItem[] = [
     to: "/justificaciones",
     icon: FileCheck2,
   },
+  { name: "Actos Procesales", to: "/actos-procesales", icon: Scale },
   { name: "Usuarios", to: "/usuarios", icon: UserCog },
   { name: "Personas", to: "/personas", icon: UserCheck },
   { name: "Roles", to: "/roles", icon: ShieldCheck },
@@ -91,7 +93,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
       }
 
       // Módulos base por defecto para otros roles mientras se sincroniza
-      return ["dashboard", "beneficiarios", "hitos", "asistencias", "justificaciones", "faqs"].includes(codigo);
+      return ["dashboard", "beneficiarios", "hitos", "asistencias", "justificaciones", "actos-procesales", "faqs"].includes(codigo);
     });
   }, [codigosPermitidos, isSuperAdmin]);
 

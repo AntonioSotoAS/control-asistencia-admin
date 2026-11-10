@@ -1,21 +1,15 @@
 import { useState } from "react";
 import { PersonasTable } from "../components/PersonasTable";
-import { PersonaModal } from "../components/PersonaModal";
+import { PersonaUsuarioModal } from "../components/PersonaUsuarioModal";
 import { EliminarPersonaModal } from "../components/EliminarPersonaModal";
 import { Button } from "@/components/ui";
 import { UserPlus, Search, RefreshCw, CheckCircle2 } from "lucide-react";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import {
   useGetPersonasQuery,
-  useCrearPersonaMutation,
-  useActualizarPersonaMutation,
   useEliminarPersonaMutation,
 } from "../services/personasApi";
-import type {
-  Persona,
-  CrearPersonaPayload,
-  ActualizarPersonaPayload,
-} from "../types/persona.types";
+import type { Persona } from "../types/persona.types";
 
 export function PersonasPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,8 +30,6 @@ export function PersonasPage() {
     refetch,
   } = useGetPersonasQuery(debouncedQuery);
 
-  const [crearPersona, { isLoading: isCreating }] = useCrearPersonaMutation();
-  const [actualizarPersona, { isLoading: isUpdating }] = useActualizarPersonaMutation();
   const [eliminarPersona, { isLoading: isDeleting }] = useEliminarPersonaMutation();
 
   const showNotification = (msg: string) => {
@@ -59,16 +51,6 @@ export function PersonasPage() {
 
   const handleDelete = (persona: Persona) => {
     setDeletingPersona(persona);
-  };
-
-  const handleSaveCreate = async (payload: CrearPersonaPayload) => {
-    await crearPersona(payload).unwrap();
-    showNotification("Persona registrada exitosamente en el padrón.");
-  };
-
-  const handleSaveUpdate = async (payload: ActualizarPersonaPayload) => {
-    await actualizarPersona(payload).unwrap();
-    showNotification("Datos de la persona actualizados correctamente.");
   };
 
   const handleConfirmDelete = async (id: number) => {
@@ -125,9 +107,9 @@ export function PersonasPage() {
               variant="primary"
               onClick={handleOpenCreate}
               leftIcon={<UserPlus className="w-4 h-4" />}
-              className="font-bold shrink-0"
+              className="bg-[#562599] hover:bg-[#471e7f] text-white font-bold shrink-0"
             >
-              Registrar Persona
+              Registrar Persona y Cuenta
             </Button>
           </div>
         </div>
@@ -144,14 +126,12 @@ export function PersonasPage() {
         onRetry={() => refetch()}
       />
 
-      {/* Modal Crear / Editar */}
-      <PersonaModal
+      {/* Modal Unificado Registrar Persona y Cuenta */}
+      <PersonaUsuarioModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         personaToEdit={editingPersona}
-        onSaveCreate={handleSaveCreate}
-        onSaveUpdate={handleSaveUpdate}
-        isLoading={isCreating || isUpdating}
+        onSuccess={showNotification}
       />
 
       {/* Modal Confirmación de Eliminación */}

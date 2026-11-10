@@ -13,6 +13,7 @@ import { PersonasPage } from "@/features/personas/pages/PersonasPage";
 import { RolesPage } from "@/features/roles/pages/RolesPage";
 import { PantallasPage } from "@/features/pantallas/pages/PantallasPage";
 import { FaqsPage } from "@/features/faqs/pages/FaqsPage";
+import { ActosProcesalesPage } from "@/features/actos-procesales/pages/ActosProcesalesPage";
 
 export function AppRouter() {
   return (
@@ -29,6 +30,7 @@ export function AppRouter() {
         <Route path="asistencias" element={<AsistenciasPage />} />
         <Route path="justificaciones" element={<JustificacionesPage />} />
         {/* <Route path="reportes" element={<ReportesPage />} /> */}
+        <Route path="actos-procesales" element={<ActosProcesalesPage />} />
         <Route path="usuarios" element={<UsuariosPage />} />
         <Route path="personas" element={<PersonasPage />} />
         <Route path="roles" element={<RolesPage />} />

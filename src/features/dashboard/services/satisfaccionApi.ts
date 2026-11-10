@@ -48,3 +48,4 @@ export const {
   useGetReporteSatisfaccionQuery,
   useGetSatisfaccionListQuery,
 } = satisfaccionApi;
+
