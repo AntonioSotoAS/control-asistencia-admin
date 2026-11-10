@@ -83,7 +83,20 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
       // Si ya cargaron las pantallas asignadas, se respeta estrictamente la lista de permisos
       if (codigosPermitidos !== null) {
         if (codigo === "usuarios" || codigo === "cuentas") {
-          return codigosPermitidos.includes("usuarios") || codigosPermitidos.includes("personas");
+          return (
+            codigosPermitidos.includes("usuarios") ||
+            codigosPermitidos.includes("cuentas") ||
+            codigosPermitidos.includes("cuentas-acceso") ||
+            codigosPermitidos.includes("cuentas_acceso") ||
+            codigosPermitidos.includes("personas")
+          );
+        }
+        if (codigo === "actos-procesales") {
+          return (
+            codigosPermitidos.includes("actos-procesales") ||
+            codigosPermitidos.includes("actos_procesales") ||
+            codigosPermitidos.includes("actosprocesales")
+          );
         }
         return codigosPermitidos.includes(codigo);
       }
