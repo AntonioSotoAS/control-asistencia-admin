@@ -7,7 +7,6 @@ import {
   CalendarCheck2,
   FileCheck2,
   UserCog,
-  UserCheck,
   ShieldCheck,
   SlidersHorizontal,
   HelpCircle,
@@ -45,8 +44,7 @@ const navItems: NavItem[] = [
     icon: FileCheck2,
   },
   { name: "Actos Procesales", to: "/actos-procesales", icon: Scale },
-  { name: "Usuarios", to: "/usuarios", icon: UserCog },
-  { name: "Personas", to: "/personas", icon: UserCheck },
+  { name: "Cuentas de Acceso", to: "/usuarios", icon: UserCog },
   { name: "Roles", to: "/roles", icon: ShieldCheck },
   { name: "Pantallas", to: "/pantallas", icon: SlidersHorizontal },
   { name: "FAQs", to: "/faqs", icon: HelpCircle },
@@ -84,6 +82,9 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
 
       // Si ya cargaron las pantallas asignadas, se respeta estrictamente la lista de permisos
       if (codigosPermitidos !== null) {
+        if (codigo === "usuarios" || codigo === "cuentas") {
+          return codigosPermitidos.includes("usuarios") || codigosPermitidos.includes("personas");
+        }
         return codigosPermitidos.includes(codigo);
       }
 
@@ -93,7 +94,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
       }
 
       // Módulos base por defecto para otros roles mientras se sincroniza
-      return ["dashboard", "beneficiarios", "hitos", "asistencias", "justificaciones", "actos-procesales", "faqs"].includes(codigo);
+      return ["dashboard", "beneficiarios", "hitos", "asistencias", "justificaciones", "actos-procesales", "usuarios", "faqs"].includes(codigo);
     });
   }, [codigosPermitidos, isSuperAdmin]);
 

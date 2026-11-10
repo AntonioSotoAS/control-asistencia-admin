@@ -51,12 +51,16 @@ const routeTitles: Record<string, { title: string; subtitle: string }> = {
     subtitle: "Exportación consolidada e indicadores clave",
   },
   "/usuarios": {
-    title: "Administración de Usuarios",
-    subtitle: "Gestión de operadores, supervisores y permisos",
+    title: "Cuentas de Acceso",
+    subtitle: "Gestión unificada de usuarios, credenciales y padrón de personas",
+  },
+  "/cuentas": {
+    title: "Cuentas de Acceso",
+    subtitle: "Gestión unificada de usuarios, credenciales y padrón de personas",
   },
   "/personas": {
-    title: "Padrón de Personas",
-    subtitle: "Registro de ciudadanos, beneficiarios y expedientes",
+    title: "Cuentas de Acceso",
+    subtitle: "Gestión unificada de usuarios, credenciales y padrón de personas",
   },
   "/roles": {
     title: "Catálogo de Roles y Permisos",
