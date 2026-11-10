@@ -6,6 +6,7 @@ import { FichaContactoModal } from "../components/FichaContactoModal";
 import { QuickActions } from "../components/QuickActions";
 import { AttendanceChart } from "../components/AttendanceChart";
 import { RecentActivityList } from "../components/RecentActivityList";
+import { SatisfaccionCard } from "../components/SatisfaccionCard";
 import { JustificacionModal } from "@/features/justificaciones/components/JustificacionModal";
 import { Button } from "@/components/ui";
 import { RefreshCw, CheckCircle2, PhoneCall, ShieldAlert } from "lucide-react";
@@ -401,23 +402,30 @@ export function DashboardPage() {
       {/* KPIs Operativos con datos del backend */}
       <StatsOverview kpis={kpis} metrics={metrics} isLoading={isLoadingSesiones} />
 
-      {/* Gráficos de Asistencia y Actividad Reciente */}
+      {/* Gráficos de Asistencia y Reporte de Satisfacción */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <AttendanceChart data={tendenciaReal} />
         </div>
         <div className="lg:col-span-1">
-          <RecentActivityList data={actividadRecienteReal} />
+          <SatisfaccionCard />
         </div>
       </div>
 
-      {/* MONITOR PRINCIPAL: Inasistencias y Tardanzas con Nombre y Teléfono */}
-      <MonitorInasistencias
-        alertas={alertasInasistencias}
-        isLoading={isLoadingSesiones}
-        onOpenFicha={(alerta) => setSelectedAlertaForFicha(alerta)}
-        onRegistrarJustificacion={handleOpenJustificacion}
-      />
+      {/* MONITOR PRINCIPAL y Actividad Reciente */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <MonitorInasistencias
+            alertas={alertasInasistencias}
+            isLoading={isLoadingSesiones}
+            onOpenFicha={(alerta) => setSelectedAlertaForFicha(alerta)}
+            onRegistrarJustificacion={handleOpenJustificacion}
+          />
+        </div>
+        <div className="lg:col-span-1">
+          <RecentActivityList data={actividadRecienteReal} />
+        </div>
+      </div>
 
       {/* Acciones Rápidas Complementarias */}
       <QuickActions />

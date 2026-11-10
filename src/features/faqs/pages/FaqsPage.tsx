@@ -2,8 +2,9 @@ import { useState, useMemo } from "react";
 import { FaqsTable } from "../components/FaqsTable";
 import { FaqModal } from "../components/FaqModal";
 import { EliminarFaqModal } from "../components/EliminarFaqModal";
+import { ChatbotPreviewModal } from "../components/ChatbotPreviewModal";
 import { Button } from "@/components/ui";
-import { Plus, Search, RefreshCw, CheckCircle2, HelpCircle } from "lucide-react";
+import { Plus, Search, RefreshCw, CheckCircle2, HelpCircle, Smartphone } from "lucide-react";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import {
   useGetFaqsQuery,
@@ -18,6 +19,7 @@ export function FaqsPage() {
   const debouncedSearch = useDebounce(searchTerm, 300);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [editingFaq, setEditingFaq] = useState<Faq | null>(null);
   const [deletingFaq, setDeletingFaq] = useState<Faq | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
@@ -138,6 +140,17 @@ export function FaqsPage() {
             </Button>
 
             <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsPreviewOpen(true)}
+              leftIcon={<Smartphone className="w-4 h-4 text-[#562599]" />}
+              className="text-xs font-semibold px-3 text-[#562599] border-[#562599]/30 hover:bg-[#562599]/10"
+              title="Previsualizar cómo ven las preguntas los beneficiarios en la app"
+            >
+              Vista Previa App
+            </Button>
+
+            <Button
               variant="primary"
               onClick={handleOpenCreate}
               leftIcon={<Plus className="w-4 h-4" />}
@@ -179,6 +192,13 @@ export function FaqsPage() {
         faq={deletingFaq}
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
+      />
+
+      {/* Modal de Vista Previa Asistente Virtual / App */}
+      <ChatbotPreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        faqs={faqs}
       />
     </div>
   );

@@ -7,9 +7,19 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { logout } from "@/features/auth/services/authSlice";
 
-const apiBase =
-  (import.meta.env.VITE_API_URL as string)?.replace(/\/+$/, "") ||
-  "https://sitrad.cortedelsanta.com/api";
+const rawEnvUrl = (import.meta.env.VITE_API_URL as string)?.trim() || "";
+let apiBase = rawEnvUrl;
+if (apiBase) {
+  if (!apiBase.startsWith("http://") && !apiBase.startsWith("https://")) {
+    apiBase = `http://${apiBase}`;
+  }
+  apiBase = apiBase.replace(/\/+$/, "");
+  if (!apiBase.endsWith("/api")) {
+    apiBase = `${apiBase}/api`;
+  }
+} else {
+  apiBase = "https://sitrad.cortedelsanta.com/api";
+}
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: apiBase,
@@ -60,6 +70,6 @@ const baseQueryWithReauth: BaseQueryFn<
 export const baseApi = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Persona", "Hito", "Sesion", "Usuario", "Rol", "Justificacion", "Pantalla", "Faq"],
+  tagTypes: ["Persona", "Hito", "Sesion", "Usuario", "Rol", "Justificacion", "Pantalla", "Faq", "Satisfaccion"],
   endpoints: () => ({}),
 });

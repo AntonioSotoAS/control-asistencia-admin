@@ -7,3 +7,6 @@ export * from "./components/StatsOverview";
 export * from "./components/AttendanceChart";
 export * from "./components/RecentActivityList";
 export * from "./components/QuickActions";
+export * from "./components/SatisfaccionCard";
+export * from "./services/satisfaccionApi";
+export * from "./types/satisfaccion.types";

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Input } from "@/components/ui";
-import { HelpCircle, AlertCircle, Hash, Tag, FileText } from "lucide-react";
+import { HelpCircle, AlertCircle, Hash, Tag, FileText, Link2 } from "lucide-react";
 import type { Faq, CrearFaqPayload, ActualizarFaqPayload, ApiErrorResponse } from "../types/faq.types";
 
 interface FaqModalProps {
@@ -23,6 +23,7 @@ export function FaqModal({
   const isEditing = Boolean(faqToEdit);
 
   const [pregunta, setPregunta] = useState("");
+  const [slug, setSlug] = useState("");
   const [respuesta, setRespuesta] = useState("");
   const [clavesText, setClavesText] = useState("");
   const [orden, setOrden] = useState<number | string>("");
@@ -32,11 +33,13 @@ export function FaqModal({
   useEffect(() => {
     if (faqToEdit) {
       setPregunta(faqToEdit.pregunta || "");
+      setSlug(faqToEdit.slug || "");
       setRespuesta(faqToEdit.respuesta || "");
       setClavesText(faqToEdit.claves ? faqToEdit.claves.join(", ") : "");
       setOrden(faqToEdit.orden !== undefined ? faqToEdit.orden : "");
     } else {
       setPregunta("");
+      setSlug("");
       setRespuesta("");
       setClavesText("");
       setOrden("");
@@ -55,8 +58,8 @@ export function FaqModal({
       return;
     }
 
-    if (respuesta.trim().length < 15) {
-      setErrorMessage("La respuesta debe tener al menos 15 caracteres para ser informativa.");
+    if (respuesta.trim().length < 20) {
+      setErrorMessage("La respuesta debe tener al menos 20 caracteres para explicar el tema con claridad.");
       return;
     }
 
@@ -65,22 +68,35 @@ export function FaqModal({
       .map((k) => k.trim())
       .filter((k) => k.length > 0);
 
+    if (claves.length === 0) {
+      setErrorMessage("Debes ingresar al menos una palabra clave para que el asistente virtual pueda identificar la consulta.");
+      return;
+    }
+
+    const cleanSlug = slug.trim().toLowerCase();
+    if (cleanSlug && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(cleanSlug)) {
+      setErrorMessage("El slug solo puede contener letras minúsculas, números y guiones (ejemplo: registrar-asistencia).");
+      return;
+    }
+
     const ordenNum = orden !== "" ? Number(orden) : undefined;
 
     try {
       if (isEditing && faqToEdit) {
         await onSaveUpdate({
           id: faqToEdit.id,
+          slug: cleanSlug || undefined,
           pregunta: pregunta.trim(),
           respuesta: respuesta.trim(),
-          claves: claves.length > 0 ? claves : undefined,
+          claves,
           orden: ordenNum,
         });
       } else {
         await onSaveCreate({
+          slug: cleanSlug || undefined,
           pregunta: pregunta.trim(),
           respuesta: respuesta.trim(),
-          claves: claves.length > 0 ? claves : undefined,
+          claves,
           orden: ordenNum,
         });
       }
@@ -103,7 +119,7 @@ export function FaqModal({
       isOpen={isOpen}
       onClose={onClose}
       title={isEditing ? `Editar Pregunta #${faqToEdit?.id}` : "Nueva Pregunta Frecuente"}
-      description="Configura la pregunta, respuesta detallada y palabras clave para la atención del usuario."
+      description="Configura la pregunta, respuesta detallada y palabras clave para la atención del usuario en el Asistente Virtual."
       maxWidth="lg"
       footer={
         <>
@@ -156,23 +172,49 @@ export function FaqModal({
           <Input
             value={pregunta}
             onChange={(e) => setPregunta(e.target.value)}
-            placeholder="Ej: ¿Cómo justifico una inasistencia a mi sesión?"
+            placeholder="Ej: ¿Cómo registro mi asistencia a la terapia?"
             required
           />
         </div>
 
+        {/* Slug / Identificador */}
+        <div className="space-y-1.5 text-left">
+          <label className="text-xs font-bold uppercase tracking-wider text-carbon flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <Link2 className="w-3.5 h-3.5 text-olivo" />
+              Identificador / Slug en App (Opcional)
+            </span>
+            <span className="text-[10px] text-olivo font-normal lowercase">
+              ej: registrar-asistencia
+            </span>
+          </label>
+          <Input
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            placeholder="Si se deja vacío, se genera automáticamente de la pregunta"
+          />
+          <p className="text-[11px] text-olivo">
+            Identificador único que utiliza la app en minúsculas y con guiones.
+          </p>
+        </div>
+
         {/* Respuesta */}
         <div className="space-y-1.5 text-left">
-          <label className="text-xs font-bold uppercase tracking-wider text-carbon flex items-center gap-1.5">
-            <FileText className="w-3.5 h-3.5 text-guinda" />
-            Respuesta Detallada *
+          <label className="text-xs font-bold uppercase tracking-wider text-carbon flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-guinda" />
+              Respuesta Detallada *
+            </span>
+            <span className="text-[10px] text-olivo font-normal">
+              mínimo 20 caracteres ({respuesta.length}/20)
+            </span>
           </label>
           <textarea
             value={respuesta}
             onChange={(e) => setRespuesta(e.target.value)}
             rows={4}
             className="w-full text-xs font-medium bg-suave/50 border border-linea rounded-field p-3 text-carbon placeholder:text-carbon/40 focus:outline-none focus:border-guinda focus:bg-white transition"
-            placeholder="Escribe la respuesta clara que resolverá la duda del beneficiario o usuario..."
+            placeholder="Escribe la respuesta clara que resolverá la duda del beneficiario o usuario (mínimo 20 caracteres)..."
             required
           />
         </div>
@@ -182,19 +224,23 @@ export function FaqModal({
           <div className="sm:col-span-2 space-y-1.5">
             <label className="text-xs font-bold uppercase tracking-wider text-carbon flex items-center gap-1.5">
               <Tag className="w-3.5 h-3.5 text-olivo" />
-              Palabras Clave (separadas por coma)
+              Palabras Clave * (separadas por coma)
             </label>
             <Input
               value={clavesText}
               onChange={(e) => setClavesText(e.target.value)}
-              placeholder="Ej: inasistencia, certificado, justificar"
+              placeholder="Ej: registrar asistencia, constancia, comprobante"
+              required
             />
+            <p className="text-[10px] text-olivo">
+              Palabras clave que activan esta respuesta en el chatbot de soporte.
+            </p>
           </div>
 
           <div className="space-y-1.5">
             <label className="text-xs font-bold uppercase tracking-wider text-carbon flex items-center gap-1.5">
               <Hash className="w-3.5 h-3.5 text-olivo" />
-              Orden de Visualización
+              Orden en Catálogo
             </label>
             <Input
               type="number"
@@ -209,4 +255,3 @@ export function FaqModal({
     </Modal>
   );
 }
-

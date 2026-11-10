@@ -52,7 +52,7 @@ export const faqsApi = baseApi.injectEndpoints({
 
     crearFaq: builder.mutation<Faq, CrearFaqPayload>({
       query: (body) => {
-        const slug = body.slug?.trim() || generateSlug(body.pregunta);
+        const slug = body.slug?.trim() ? generateSlug(body.slug) : generateSlug(body.pregunta);
         const claves = extractKeywords(body.pregunta, body.claves);
 
         return {
@@ -71,7 +71,9 @@ export const faqsApi = baseApi.injectEndpoints({
     actualizarFaq: builder.mutation<Faq, ActualizarFaqPayload>({
       query: ({ id, ...body }) => {
         const payload: Record<string, unknown> = { ...body };
-        if (body.pregunta && !body.slug) {
+        if (body.slug?.trim()) {
+          payload.slug = generateSlug(body.slug);
+        } else if (body.pregunta && body.slug === "") {
           payload.slug = generateSlug(body.pregunta);
         }
         if (body.pregunta && (!body.claves || body.claves.length === 0)) {
