@@ -44,7 +44,7 @@ const navItems: NavItem[] = [
     icon: FileCheck2,
   },
   { name: "Actos Procesales", to: "/actos-procesales", icon: Scale },
-  { name: "Cuentas de Acceso", to: "/usuarios", icon: UserCog },
+  { name: "Cuentas de Acceso", to: "/cuentas", icon: UserCog },
   { name: "Roles", to: "/roles", icon: ShieldCheck },
   { name: "Pantallas", to: "/pantallas", icon: SlidersHorizontal },
   { name: "FAQs", to: "/faqs", icon: HelpCircle },
@@ -107,7 +107,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
       }
 
       // Módulos base por defecto para otros roles mientras se sincroniza
-      return ["dashboard", "beneficiarios", "hitos", "asistencias", "justificaciones", "actos-procesales", "usuarios", "faqs"].includes(codigo);
+      return ["dashboard", "beneficiarios", "hitos", "asistencias", "justificaciones", "actos-procesales", "cuentas", "usuarios", "faqs"].includes(codigo);
     });
   }, [codigosPermitidos, isSuperAdmin]);
 
