@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Input } from "@/components/ui";
-import { AlertCircle, User, ShieldCheck } from "lucide-react";
+import { AlertCircle, User, ShieldCheck, Search, CheckCircle2 } from "lucide-react";
+import { useBuscarActoPorDocumentoMutation } from "@/features/actos-procesales/services/actosProcesalesApi";
 import type {
   Persona,
   CrearPersonaPayload,
@@ -12,8 +13,10 @@ interface PersonaModalProps {
   isOpen: boolean;
   onClose: () => void;
   personaToEdit?: Persona | null;
-  onSaveCreate: (data: CrearPersonaPayload) => Promise<void>;
+  initialDni?: string;
+  onSaveCreate: (data: CrearPersonaPayload) => Promise<Persona | void>;
   onSaveUpdate: (data: ActualizarPersonaPayload) => Promise<void>;
+  onPersonaCreated?: (persona: Persona) => void;
   isLoading?: boolean;
 }
 
@@ -21,8 +24,10 @@ export function PersonaModal({
   isOpen,
   onClose,
   personaToEdit,
+  initialDni,
   onSaveCreate,
   onSaveUpdate,
+  onPersonaCreated,
   isLoading,
 }: PersonaModalProps) {
   const [nombre, setNombre] = useState("");
@@ -34,10 +39,14 @@ export function PersonaModal({
   const [seguimiento, setSeguimiento] = useState("");
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+
+  const [buscarActo, { isLoading: isSearchingDni }] = useBuscarActoPorDocumentoMutation();
 
   useEffect(() => {
     setErrorMessage(null);
+    setInfoMessage(null);
     setFieldErrors({});
 
     if (personaToEdit) {
@@ -50,14 +59,43 @@ export function PersonaModal({
       setSeguimiento(personaToEdit.seguimiento || "");
     } else {
       setNombre("");
-      setDni("");
+      setDni(initialDni || "");
       setEmail("");
       setTelefono("");
       setExpediente("");
       setJuzgado("");
       setSeguimiento("en_curso");
+
+      if (initialDni && initialDni.length === 8 && isOpen) {
+        handleBuscarDni(initialDni);
+      }
     }
-  }, [personaToEdit, isOpen]);
+  }, [personaToEdit, isOpen, initialDni]);
+
+  const handleBuscarDni = async (docOverride?: string) => {
+    const target = (docOverride ?? dni).trim();
+    if (!target || target.length !== 8) {
+      setErrorMessage("Ingresa un DNI de 8 dígitos para consultar los actos procesales.");
+      return;
+    }
+
+    setErrorMessage(null);
+    setInfoMessage(null);
+
+    try {
+      const data = await buscarActo(target).unwrap();
+      if (data) {
+        if (data.nombre) setNombre(data.nombre);
+        if (data.casos && data.casos.length > 0) {
+          if (data.casos[0].expediente) setExpediente(data.casos[0].expediente);
+          if (data.casos[0].juzgado) setJuzgado(data.casos[0].juzgado);
+        }
+        setInfoMessage(`Datos encontrados en actos procesales para ${data.nombre}. Se completaron los campos.`);
+      }
+    } catch {
+      setInfoMessage("No se encontraron actos procesales previos para este DNI. Puedes ingresar los datos manualmente.");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +135,10 @@ export function PersonaModal({
           juzgado: juzgado.trim() || undefined,
           seguimiento: seguimiento.trim() || undefined,
         };
-        await onSaveCreate(payload);
+        const res = await onSaveCreate(payload);
+        if (res && onPersonaCreated) {
+          onPersonaCreated(res as Persona);
+        }
       }
       onClose();
     } catch (err: unknown) {
@@ -170,31 +211,55 @@ export function PersonaModal({
           </div>
         )}
 
-        {/* Datos Principales */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="sm:col-span-2">
-            <Input
-              label="Nombre Completo"
-              placeholder="Ej. Luis Pérez Soto"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              leftIcon={<User className="w-4 h-4" />}
-              required
-              error={fieldErrors.nombre?.[0]}
-            />
+        {/* DNI con Búsqueda en Actos Procesales */}
+        <div className="space-y-1.5 text-left">
+          <label className="block text-sm font-semibold text-carbon">
+            Documento de Identidad (DNI) *
+          </label>
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <input
+                type="text"
+                placeholder="8 dígitos numéricos"
+                maxLength={8}
+                value={dni}
+                onChange={(e) => setDni(e.target.value.replace(/\D/g, ""))}
+                required
+                className="w-full text-xs font-mono font-bold bg-white border border-linea rounded-field px-3 py-2 text-carbon focus:outline-none focus:border-guinda"
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleBuscarDni()}
+              isLoading={isSearchingDni}
+              className="h-9 px-3 text-xs shrink-0 font-bold"
+              title="Consultar datos en actos procesales"
+            >
+              <Search className="w-3.5 h-3.5 mr-1 text-olivo" />
+              Buscar Datos
+            </Button>
           </div>
+          {infoMessage && (
+            <p className="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 p-2 rounded-field flex items-center gap-1.5 mt-1">
+              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+              <span>{infoMessage}</span>
+            </p>
+          )}
+        </div>
 
-          <div>
-            <Input
-              label="DNI"
-              placeholder="8 dígitos"
-              maxLength={8}
-              value={dni}
-              onChange={(e) => setDni(e.target.value.replace(/\D/g, ""))}
-              required
-              error={fieldErrors.dni?.[0]}
-            />
-          </div>
+        {/* Nombre Completo */}
+        <div>
+          <Input
+            label="Nombre Completo *"
+            placeholder="Ej. Luis Alberto Pérez Soto"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            leftIcon={<User className="w-4 h-4" />}
+            required
+            error={fieldErrors.nombre?.[0]}
+          />
         </div>
 
         {/* Contacto */}

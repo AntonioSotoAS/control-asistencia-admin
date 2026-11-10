@@ -38,6 +38,20 @@ export interface ActualizarPersonaPayload {
   seguimiento?: string;
 }
 
+export interface RegistrarPersonaYCuentaPayload {
+  nombre: string;
+  dni?: string;
+  email?: string;
+  telefono?: string;
+  expediente?: string;
+  juzgado?: string;
+  seguimiento?: string;
+  identificador: string;
+  password: string;
+  rol: string;
+  estado?: "activo" | "inactivo";
+}
+
 export interface ApiErrorResponse {
   message?: string;
   mensaje?: string;

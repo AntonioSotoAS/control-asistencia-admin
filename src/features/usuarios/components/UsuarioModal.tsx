@@ -142,6 +142,10 @@ export function UsuarioModal({
 
     try {
       if (usuarioToEdit) {
+        if (password && password.length < 8) {
+          setErrorMessage("La nueva contraseña debe tener al menos 8 caracteres.");
+          return;
+        }
         const payload: ActualizarUsuarioPayload = {
           id: usuarioToEdit.id,
           persona_id: Number(personaId),
@@ -152,8 +156,8 @@ export function UsuarioModal({
         };
         await onSaveUpdate(payload);
       } else {
-        if (!password) {
-          setErrorMessage("La contraseña es requerida para un nuevo usuario.");
+        if (!password || password.length < 8) {
+          setErrorMessage("La contraseña debe tener al menos 8 caracteres.");
           return;
         }
         const payload: CrearUsuarioPayload = {
@@ -331,7 +335,7 @@ export function UsuarioModal({
           <Input
             label={usuarioToEdit ? "Contraseña (opcional)" : "Contraseña"}
             type={showPassword ? "text" : "password"}
-            placeholder={usuarioToEdit ? "Dejar en blanco para no cambiar" : "ClaveSegura1"}
+            placeholder={usuarioToEdit ? "Dejar en blanco para no cambiar" : "Mínimo 8 caracteres"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required={!usuarioToEdit}

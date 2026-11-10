@@ -11,7 +11,11 @@ import {
   Scale,
 } from "lucide-react";
 import { useBuscarActoPorDocumentoMutation } from "@/features/actos-procesales/services/actosProcesalesApi";
-import { useCrearPersonaMutation, useActualizarPersonaMutation } from "../services/personasApi";
+import {
+  useCrearPersonaMutation,
+  useActualizarPersonaMutation,
+  useRegistrarPersonaYCuentaMutation,
+} from "../services/personasApi";
 import { useCrearUsuarioMutation } from "@/features/usuarios/services/usuariosApi";
 import type { Persona, ActualizarPersonaPayload } from "../types/persona.types";
 import type { ActoProcesalCaso } from "@/features/actos-procesales/types/actoProcesal.types";
@@ -71,8 +75,9 @@ export function PersonaUsuarioModal({
   const [crearPersona, { isLoading: isCreatingPersona }] = useCrearPersonaMutation();
   const [actualizarPersona, { isLoading: isUpdatingPersona }] = useActualizarPersonaMutation();
   const [crearUsuario, { isLoading: isCreatingUsuario }] = useCrearUsuarioMutation();
+  const [registrarPersonaYCuenta, { isLoading: isRegisteringBoth }] = useRegistrarPersonaYCuentaMutation();
 
-  const isSubmitting = isCreatingPersona || isUpdatingPersona || isCreatingUsuario;
+  const isSubmitting = isCreatingPersona || isUpdatingPersona || isCreatingUsuario || isRegisteringBoth;
 
   useEffect(() => {
     setErrorMessage(null);
@@ -222,8 +227,8 @@ export function PersonaUsuarioModal({
         setErrorMessage("El identificador de acceso es requerido.");
         return;
       }
-      if (!password.trim() || password.length < 6) {
-        setErrorMessage("La contraseña debe tener al menos 6 caracteres.");
+      if (!password.trim() || password.length < 8) {
+        setErrorMessage("La contraseña debe tener al menos 8 caracteres.");
         return;
       }
     }
@@ -245,14 +250,39 @@ export function PersonaUsuarioModal({
         onSuccess?.(`Datos de ${nombreCompleto} actualizados exitosamente.`);
         onClose();
       } else {
-        // Flujo de Registro Unificado
-        let targetPersonaId: number;
+        // Si se crea persona con cuenta desde cero, usar el endpoint atómico /api/registros
+        if (crearCuenta && !personaExistente) {
+          await registrarPersonaYCuenta({
+            nombre: nombreCompleto,
+            dni: dni.trim(),
+            email: correo.trim() || undefined,
+            telefono: telefono.trim() || undefined,
+            expediente: expediente.trim() || undefined,
+            juzgado: juzgado.trim() || undefined,
+            seguimiento: seguimiento !== "sin_seguimiento" ? seguimiento : undefined,
+            identificador: identificador.trim(),
+            password: password.trim(),
+            rol: rol,
+            estado: cuentaActiva ? "activo" : "inactivo",
+          }).unwrap();
 
-        if (personaExistente) {
-          targetPersonaId = personaExistente.id;
+          onSuccess?.(
+            `Persona ${nombreCompleto} registrada y cuenta de acceso creada correctamente.`
+          );
+        } else if (crearCuenta && personaExistente) {
+          // Persona ya existía, solo se crea la cuenta
+          await crearUsuario({
+            persona_id: personaExistente.id,
+            identificador: identificador.trim(),
+            password: password.trim(),
+            rol: rol as any,
+            estado: cuentaActiva ? "activo" : "inactivo",
+          }).unwrap();
+
+          onSuccess?.(`Cuenta de acceso creada exitosamente para ${nombreCompleto}.`);
         } else {
-          // 1. Crear persona
-          const personaResp: any = await crearPersona({
+          // Solo registrar persona en el padrón
+          await crearPersona({
             nombre: nombreCompleto,
             dni: dni.trim(),
             email: correo.trim() || undefined,
@@ -262,23 +292,6 @@ export function PersonaUsuarioModal({
             seguimiento: seguimiento !== "sin_seguimiento" ? seguimiento : undefined,
           }).unwrap();
 
-          targetPersonaId = Number(personaResp?.data?.id || personaResp?.id);
-        }
-
-        // 2. Si se solicitó cuenta de acceso, crear usuario
-        if (crearCuenta && targetPersonaId) {
-          await crearUsuario({
-            persona_id: targetPersonaId,
-            identificador: identificador.trim(),
-            password: password,
-            rol: rol as any,
-            estado: cuentaActiva ? "activo" : "inactivo",
-          }).unwrap();
-
-          onSuccess?.(
-            `Persona ${nombreCompleto} registrada y cuenta de acceso creada correctamente.`
-          );
-        } else {
           onSuccess?.(`Persona ${nombreCompleto} registrada exitosamente en el padrón.`);
         }
 

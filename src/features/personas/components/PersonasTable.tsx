@@ -7,7 +7,7 @@ import {
   TableCell,
   Button,
 } from "@/components/ui";
-import { Edit2, Trash2, Users, AlertCircle, Loader2, Phone, Mail, Scale } from "lucide-react";
+import { Edit2, Trash2, Users, AlertCircle, Loader2, Phone, Mail, Scale, UserPlus } from "lucide-react";
 import type { Persona } from "../types/persona.types";
 import { getSeguimientoBadge } from "@/features/beneficiarios/components/BeneficiariosTable";
 
@@ -18,6 +18,7 @@ interface PersonasTableProps {
   error?: unknown;
   onEdit: (persona: Persona) => void;
   onDelete: (persona: Persona) => void;
+  onCrearCuenta?: (persona: Persona) => void;
   onRetry?: () => void;
 }
 
@@ -28,6 +29,7 @@ export function PersonasTable({
   error,
   onEdit,
   onDelete,
+  onCrearCuenta,
   onRetry,
 }: PersonasTableProps) {
   if (isLoading) {
@@ -176,7 +178,19 @@ export function PersonasTable({
             </TableCell>
 
             <TableCell className="text-right">
-              <div className="flex items-center justify-end gap-1">
+              <div className="flex items-center justify-end gap-1.5">
+                {onCrearCuenta && !p.usuario && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onCrearCuenta(p)}
+                    className="h-7 px-2 text-[11px] font-bold text-guinda border-guinda/40 hover:bg-guinda/10"
+                    title="Crear cuenta de acceso (Paso 2)"
+                  >
+                    <UserPlus className="w-3 h-3 mr-1" />
+                    + Cuenta
+                  </Button>
+                )}
                 <Button
                   variant="ghost"
                   size="sm"

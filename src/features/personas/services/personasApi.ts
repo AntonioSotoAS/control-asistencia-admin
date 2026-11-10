@@ -3,6 +3,7 @@ import type {
   Persona,
   CrearPersonaPayload,
   ActualizarPersonaPayload,
+  RegistrarPersonaYCuentaPayload,
 } from "../types/persona.types";
 
 export const personasApi = baseApi.injectEndpoints({
@@ -50,6 +51,12 @@ export const personasApi = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
+      transformResponse: (response: unknown): Persona => {
+        if (response && typeof response === "object" && "data" in response) {
+          return (response as { data: Persona }).data;
+        }
+        return response as Persona;
+      },
       invalidatesTags: [{ type: "Persona", id: "LIST" }],
     }),
 
@@ -59,9 +66,36 @@ export const personasApi = baseApi.injectEndpoints({
         method: "PUT",
         body,
       }),
+      transformResponse: (response: unknown): Persona => {
+        if (response && typeof response === "object" && "data" in response) {
+          return (response as { data: Persona }).data;
+        }
+        return response as Persona;
+      },
       invalidatesTags: (_result, _error, { id }) => [
         { type: "Persona", id },
         { type: "Persona", id: "LIST" },
+      ],
+    }),
+
+    registrarPersonaYCuenta: builder.mutation<
+      { persona: Persona; usuario?: unknown },
+      RegistrarPersonaYCuentaPayload
+    >({
+      query: (body) => ({
+        url: "/registros",
+        method: "POST",
+        body,
+      }),
+      transformResponse: (response: unknown): { persona: Persona; usuario?: unknown } => {
+        if (response && typeof response === "object" && "data" in response) {
+          return (response as { data: { persona: Persona; usuario?: unknown } }).data;
+        }
+        return response as { persona: Persona; usuario?: unknown };
+      },
+      invalidatesTags: [
+        { type: "Persona", id: "LIST" },
+        { type: "Usuario", id: "LIST" },
       ],
     }),
 
@@ -86,4 +120,5 @@ export const {
   useCrearPersonaMutation,
   useActualizarPersonaMutation,
   useEliminarPersonaMutation,
+  useRegistrarPersonaYCuentaMutation,
 } = personasApi;
