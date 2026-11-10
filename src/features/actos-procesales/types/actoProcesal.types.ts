@@ -61,3 +61,4 @@ export interface ActosProcesalesResponse {
   data: ActoProcesal[];
   pagination: PaginationMeta;
 }
+
