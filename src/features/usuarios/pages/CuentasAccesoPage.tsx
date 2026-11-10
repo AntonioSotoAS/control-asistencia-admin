@@ -364,3 +364,4 @@ export function CuentasAccesoPage({ defaultTab = "cuentas" }: CuentasAccesoPageP
 }
 
 export default CuentasAccesoPage;
+
