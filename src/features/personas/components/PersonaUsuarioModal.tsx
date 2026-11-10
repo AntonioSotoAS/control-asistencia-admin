@@ -14,7 +14,6 @@ import { useBuscarActoPorDocumentoMutation } from "@/features/actos-procesales/s
 import {
   useCrearPersonaMutation,
   useActualizarPersonaMutation,
-  useRegistrarPersonaYCuentaMutation,
 } from "../services/personasApi";
 import { useCrearUsuarioMutation } from "@/features/usuarios/services/usuariosApi";
 import type { Persona, ActualizarPersonaPayload } from "../types/persona.types";
@@ -75,9 +74,8 @@ export function PersonaUsuarioModal({
   const [crearPersona, { isLoading: isCreatingPersona }] = useCrearPersonaMutation();
   const [actualizarPersona, { isLoading: isUpdatingPersona }] = useActualizarPersonaMutation();
   const [crearUsuario, { isLoading: isCreatingUsuario }] = useCrearUsuarioMutation();
-  const [registrarPersonaYCuenta, { isLoading: isRegisteringBoth }] = useRegistrarPersonaYCuentaMutation();
 
-  const isSubmitting = isCreatingPersona || isUpdatingPersona || isCreatingUsuario || isRegisteringBoth;
+  const isSubmitting = isCreatingPersona || isUpdatingPersona || isCreatingUsuario;
 
   useEffect(() => {
     setErrorMessage(null);
@@ -250,9 +248,14 @@ export function PersonaUsuarioModal({
         onSuccess?.(`Datos de ${nombreCompleto} actualizados exitosamente.`);
         onClose();
       } else {
-        // Si se crea persona con cuenta desde cero, usar el endpoint atómico /api/registros
-        if (crearCuenta && !personaExistente) {
-          await registrarPersonaYCuenta({
+        // Flujo en 2 pasos secuenciales:
+        // 1. Primero se envía y crea la persona (POST /api/personas)
+        let targetPersonaId: number;
+
+        if (personaExistente) {
+          targetPersonaId = personaExistente.id;
+        } else {
+          const personaResp: any = await crearPersona({
             nombre: nombreCompleto,
             dni: dni.trim(),
             email: correo.trim() || undefined,
@@ -260,39 +263,26 @@ export function PersonaUsuarioModal({
             expediente: expediente.trim() || undefined,
             juzgado: juzgado.trim() || undefined,
             seguimiento: seguimiento !== "sin_seguimiento" ? seguimiento : undefined,
-            identificador: identificador.trim(),
-            password: password.trim(),
-            rol: rol,
-            estado: cuentaActiva ? "activo" : "inactivo",
           }).unwrap();
 
-          onSuccess?.(
-            `Persona ${nombreCompleto} registrada y cuenta de acceso creada correctamente.`
-          );
-        } else if (crearCuenta && personaExistente) {
-          // Persona ya existía, solo se crea la cuenta
+          targetPersonaId = Number(personaResp?.id || personaResp?.data?.id);
+        }
+
+        // 2. Con la persona ya creada y respondiendo con su ID, recién se crea la cuenta de usuario (POST /api/usuarios)
+        if (crearCuenta && targetPersonaId) {
           await crearUsuario({
-            persona_id: personaExistente.id,
+            persona_id: targetPersonaId,
             identificador: identificador.trim(),
             password: password.trim(),
             rol: rol as any,
             estado: cuentaActiva ? "activo" : "inactivo",
           }).unwrap();
 
-          onSuccess?.(`Cuenta de acceso creada exitosamente para ${nombreCompleto}.`);
+          onSuccess?.(
+            `Persona "${nombreCompleto}" registrada y cuenta de acceso creada correctamente.`
+          );
         } else {
-          // Solo registrar persona en el padrón
-          await crearPersona({
-            nombre: nombreCompleto,
-            dni: dni.trim(),
-            email: correo.trim() || undefined,
-            telefono: telefono.trim() || undefined,
-            expediente: expediente.trim() || undefined,
-            juzgado: juzgado.trim() || undefined,
-            seguimiento: seguimiento !== "sin_seguimiento" ? seguimiento : undefined,
-          }).unwrap();
-
-          onSuccess?.(`Persona ${nombreCompleto} registrada exitosamente en el padrón.`);
+          onSuccess?.(`Persona "${nombreCompleto}" registrada exitosamente en el padrón.`);
         }
 
         onClose();
