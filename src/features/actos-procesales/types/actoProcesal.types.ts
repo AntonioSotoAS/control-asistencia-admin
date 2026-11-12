@@ -20,6 +20,10 @@ export interface ListarActosProcesalesParams {
   limit?: number;
   n_unico?: string;
   x_doc_id?: string;
+  fecha_inicio?: string;
+  fecha_fin?: string;
+  desde?: string;
+  hasta?: string;
   f_ingreso_acto?: string;
 }
 

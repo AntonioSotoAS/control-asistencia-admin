@@ -9,20 +9,29 @@ export function ActosProcesalesPage() {
   const [page, setPage] = useState(1);
   const [limit] = useState(15);
   const [docId, setDocId] = useState("");
-  const [nUnico, setNUnico] = useState("");
-  const [fechaIngreso, setFechaIngreso] = useState("");
+  const [fechaInicio, setFechaInicio] = useState("");
+  const [fechaFin, setFechaFin] = useState("");
 
   // Estado para el modal unificado de Registrar Persona y Cuenta
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState<string | undefined>(undefined);
   const [notification, setNotification] = useState<string | null>(null);
 
+  // Fallback si la fecha inicio y fecha fin coinciden, o solo se indica una fecha
+  const fallbackSingleDate =
+    fechaInicio && fechaFin && fechaInicio === fechaFin
+      ? fechaInicio
+      : fechaInicio && !fechaFin
+      ? fechaInicio
+      : undefined;
+
   const { data, isLoading, isFetching, isError, error, refetch } = useGetActosProcesalesQuery({
     page,
     limit,
     x_doc_id: docId.trim() || undefined,
-    n_unico: nUnico.trim() || undefined,
-    f_ingreso_acto: fechaIngreso || undefined,
+    fecha_inicio: fechaInicio || undefined,
+    fecha_fin: fechaFin || undefined,
+    f_ingreso_acto: fallbackSingleDate,
   });
 
   const actos = data?.data || [];
@@ -42,8 +51,8 @@ export function ActosProcesalesPage() {
 
   const handleResetFilters = () => {
     setDocId("");
-    setNUnico("");
-    setFechaIngreso("");
+    setFechaInicio("");
+    setFechaFin("");
     setPage(1);
   };
 
@@ -116,29 +125,28 @@ export function ActosProcesalesPage() {
 
           <div>
             <label className="text-[11px] font-bold text-olivo uppercase block mb-1">
-              N° Único Expediente
+              Fecha Inicio
             </label>
             <input
-              type="text"
-              value={nUnico}
+              type="date"
+              value={fechaInicio}
               onChange={(e) => {
-                setNUnico(e.target.value);
+                setFechaInicio(e.target.value);
                 setPage(1);
               }}
-              placeholder="Ej: 2024010101..."
-              className="w-full text-xs font-semibold bg-suave/60 border border-linea rounded-field px-3 py-2 text-carbon focus:outline-none focus:border-guinda focus:bg-white transition font-mono"
+              className="w-full text-xs font-semibold bg-suave/60 border border-linea rounded-field px-3 py-2 text-carbon focus:outline-none focus:border-guinda focus:bg-white transition"
             />
           </div>
 
           <div>
             <label className="text-[11px] font-bold text-olivo uppercase block mb-1">
-              Fecha de Ingreso
+              Fecha Fin
             </label>
             <input
               type="date"
-              value={fechaIngreso}
+              value={fechaFin}
               onChange={(e) => {
-                setFechaIngreso(e.target.value);
+                setFechaFin(e.target.value);
                 setPage(1);
               }}
               className="w-full text-xs font-semibold bg-suave/60 border border-linea rounded-field px-3 py-2 text-carbon focus:outline-none focus:border-guinda focus:bg-white transition"
@@ -146,7 +154,7 @@ export function ActosProcesalesPage() {
           </div>
 
           <div className="flex items-end">
-            {(docId || nUnico || fechaIngreso) && (
+            {(docId || fechaInicio || fechaFin) && (
               <Button
                 variant="outline"
                 size="sm"

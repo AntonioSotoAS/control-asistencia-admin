@@ -17,6 +17,10 @@ export const actosProcesalesApi = baseApi.injectEndpoints({
         if (params?.limit) queryParams.limit = params.limit;
         if (params?.n_unico) queryParams.n_unico = params.n_unico;
         if (params?.x_doc_id) queryParams.x_doc_id = params.x_doc_id;
+        if (params?.fecha_inicio) queryParams.fecha_inicio = params.fecha_inicio;
+        if (params?.fecha_fin) queryParams.fecha_fin = params.fecha_fin;
+        if (params?.desde) queryParams.desde = params.desde;
+        if (params?.hasta) queryParams.hasta = params.hasta;
         if (params?.f_ingreso_acto) queryParams.f_ingreso_acto = params.f_ingreso_acto;
 
         return {
