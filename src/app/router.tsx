@@ -32,6 +32,7 @@ export function AppRouter() {
         <Route path="actos-procesales" element={<ActosProcesalesPage />} />
         <Route path="usuarios" element={<CuentasAccesoPage />} />
         <Route path="cuentas" element={<CuentasAccesoPage />} />
+        <Route path="cuentas-acceso" element={<CuentasAccesoPage />} />
         <Route path="personas" element={<CuentasAccesoPage defaultTab="personas" />} />
         <Route path="roles" element={<RolesPage />} />
         <Route path="pantallas" element={<PantallasPage />} />
