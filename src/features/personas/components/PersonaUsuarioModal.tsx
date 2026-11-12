@@ -135,11 +135,11 @@ export function PersonaUsuarioModal({
     }
   };
 
-  // Buscar en Actos Procesales por documento (GET /api/actos-procesales/por-documento)
+  // Buscar en Expedientes por documento (GET /api/actos-procesales/por-documento)
   const handleBuscarPorDocumento = async (docOverride?: string) => {
     const targetDoc = (docOverride ?? dni).trim();
     if (!targetDoc || targetDoc.length !== 8) {
-      setErrorMessage("Ingresa un DNI de 8 dígitos para consultar los actos procesales.");
+      setErrorMessage("Ingresa un DNI de 8 dígitos para consultar los expedientes.");
       return;
     }
 
@@ -177,18 +177,18 @@ export function PersonaUsuarioModal({
         } else {
           setPersonaExistente(null);
           setInfoMessage(
-            `Datos encontrados en actos procesales para ${data.nombre}. Se autocompletaron los campos.`
+            `Datos encontrados en expedientes para ${data.nombre}. Se autocompletaron los campos.`
           );
         }
       }
     } catch (err: any) {
       if (err?.status === 404) {
         setInfoMessage(
-          "No se encontraron actos procesales previos para este DNI. Puedes ingresar los datos manualmente."
+          "No se encontraron expedientes previos para este DNI. Puedes ingresar los datos manualmente."
         );
       } else {
         setErrorMessage(
-          err?.data?.message || err?.data?.mensaje || "Error al consultar los actos procesales por documento."
+          err?.data?.message || err?.data?.mensaje || "Error al consultar los expedientes por documento."
         );
       }
     } finally {
@@ -304,7 +304,7 @@ export function PersonaUsuarioModal({
       isOpen={isOpen}
       onClose={onClose}
       title={isEditing ? "Modificar Persona" : "Registrar persona y cuenta"}
-      description="Formulario unificado con búsqueda automática en actos procesales de la Corte y creación de credenciales."
+      description="Formulario unificado con búsqueda automática en expedientes de la Corte y creación de credenciales."
       maxWidth="lg"
       footer={
         <div className="flex items-center justify-between w-full">
@@ -388,7 +388,7 @@ export function PersonaUsuarioModal({
               onClick={() => handleBuscarPorDocumento()}
               isLoading={isSearchingDni}
               className="bg-[#562599] hover:bg-[#471e7f] text-white font-bold h-10 px-3.5 shadow-xs"
-              title="Buscar nombres y expedientes en actos procesales"
+              title="Buscar nombres y expedientes en la base judicial"
             >
               <Search className="w-4 h-4 mr-1.5" />
               <span>Buscar</span>
@@ -399,7 +399,7 @@ export function PersonaUsuarioModal({
           </p>
         </div>
 
-        {/* Casos encontrados en actos procesales */}
+        {/* Casos encontrados en expedientes */}
         {casosEncontrados.length > 1 && (
           <div className="p-3 bg-surface-muted/50 rounded-lg border border-border-soft space-y-2">
             <span className="text-[11px] font-bold text-ink-primary flex items-center gap-1.5">

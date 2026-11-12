@@ -75,11 +75,11 @@ export function ActosProcesalesPage() {
                 <Scale className="w-4 h-4" />
               </div>
               <h2 className="text-xl font-black text-carbon tracking-tight">
-                Consulta de Actos Procesales
+                Consulta de Expedientes
               </h2>
             </div>
             <p className="text-xs text-olivo">
-              Exploración de resoluciones, partes y expedientes emitidos por los juzgados de la Corte (/api/actos-procesales).
+              Exploración de expedientes judiciales, partes y resoluciones emitidos por los juzgados de la Corte.
             </p>
           </div>
 
@@ -185,7 +185,7 @@ export function ActosProcesalesPage() {
             <div>
               Mostrando página <strong className="text-carbon">{pagination.current_page}</strong> de{" "}
               <strong className="text-carbon">{pagination.last_page}</strong> (
-              {pagination.total} actos procesales registrados)
+              {pagination.total} expedientes registrados)
             </div>
 
             <div className="flex items-center gap-1.5">

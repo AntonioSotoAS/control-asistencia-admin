@@ -33,7 +33,7 @@ export function ActosProcesalesTable({
       <div className="bg-white rounded-tile border border-linea p-16 flex flex-col items-center justify-center gap-3 text-olivo">
         <Loader2 className="w-8 h-8 animate-spin text-guinda" />
         <p className="text-sm font-semibold text-carbon">
-          Consultando actos procesales de la Corte (/api/actos-procesales)...
+          Consultando expedientes de la Corte...
         </p>
       </div>
     );
@@ -46,7 +46,7 @@ export function ActosProcesalesTable({
         <AlertCircle className="w-10 h-10 text-rose-600 mx-auto" />
         <h4 className="text-base font-bold text-carbon">Error de Consulta</h4>
         <p className="text-xs text-rose-700 max-w-md mx-auto">
-          {err?.data?.message || err?.data?.mensaje || "No se pudieron cargar los actos procesales del servidor."}
+          {err?.data?.message || err?.data?.mensaje || "No se pudieron cargar los expedientes del servidor."}
         </p>
         {onRetry && (
           <Button variant="outline" size="sm" onClick={onRetry} className="mt-2">
@@ -62,10 +62,10 @@ export function ActosProcesalesTable({
       <div className="bg-white rounded-tile border border-linea p-16 text-center space-y-2">
         <Scale className="w-12 h-12 text-olivo/40 mx-auto mb-2" />
         <h4 className="text-base font-bold text-carbon">
-          No se encontraron actos procesales
+          No se encontraron expedientes
         </h4>
         <p className="text-xs text-olivo">
-          Prueba cambiando los criterios de filtro (número de expediente, DNI o fecha de ingreso).
+          Prueba cambiando los criterios de filtro (DNI o rango de fechas de ingreso).
         </p>
       </div>
     );
@@ -157,7 +157,7 @@ export function ActosProcesalesTable({
                   onClick={() => onRegistrarPersona(acto.x_doc_id || undefined)}
                   leftIcon={<UserPlus className="w-3.5 h-3.5" />}
                   className="bg-[#562599] hover:bg-[#471e7f] text-white text-xs font-bold h-7 px-2.5 shadow-xs"
-                  title="Registrar persona y cuenta a partir de este acto procesal"
+                  title="Registrar persona y cuenta a partir de este expediente"
                 >
                   Registrar
                 </Button>

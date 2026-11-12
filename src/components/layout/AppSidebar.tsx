@@ -43,7 +43,7 @@ const navItems: NavItem[] = [
     to: "/justificaciones",
     icon: FileCheck2,
   },
-  { name: "Actos Procesales", to: "/actos-procesales", icon: Scale },
+  { name: "Expedientes", to: "/expedientes", icon: Scale },
   { name: "Cuentas de Acceso", to: "/cuentas", icon: UserCog },
   { name: "Roles", to: "/roles", icon: ShieldCheck },
   { name: "Pantallas", to: "/pantallas", icon: SlidersHorizontal },
@@ -91,8 +91,10 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
             codigosPermitidos.includes("personas")
           );
         }
-        if (codigo === "actos-procesales") {
+        if (codigo === "expedientes" || codigo === "actos-procesales") {
           return (
+            codigosPermitidos.includes("expedientes") ||
+            codigosPermitidos.includes("expediente") ||
             codigosPermitidos.includes("actos-procesales") ||
             codigosPermitidos.includes("actos_procesales") ||
             codigosPermitidos.includes("actosprocesales")
@@ -107,7 +109,18 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
       }
 
       // Módulos base por defecto para otros roles mientras se sincroniza
-      return ["dashboard", "beneficiarios", "hitos", "asistencias", "justificaciones", "actos-procesales", "cuentas", "usuarios", "faqs"].includes(codigo);
+      return [
+        "dashboard",
+        "beneficiarios",
+        "hitos",
+        "asistencias",
+        "justificaciones",
+        "expedientes",
+        "actos-procesales",
+        "cuentas",
+        "usuarios",
+        "faqs",
+      ].includes(codigo);
     });
   }, [codigosPermitidos, isSuperAdmin]);
 

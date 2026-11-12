@@ -75,7 +75,7 @@ export function PersonaModal({
   const handleBuscarDni = async (docOverride?: string) => {
     const target = (docOverride ?? dni).trim();
     if (!target || target.length !== 8) {
-      setErrorMessage("Ingresa un DNI de 8 dígitos para consultar los actos procesales.");
+      setErrorMessage("Ingresa un DNI de 8 dígitos para consultar los expedientes.");
       return;
     }
 
@@ -90,10 +90,10 @@ export function PersonaModal({
           if (data.casos[0].expediente) setExpediente(data.casos[0].expediente);
           if (data.casos[0].juzgado) setJuzgado(data.casos[0].juzgado);
         }
-        setInfoMessage(`Datos encontrados en actos procesales para ${data.nombre}. Se completaron los campos.`);
+        setInfoMessage(`Datos encontrados en expedientes para ${data.nombre}. Se completaron los campos.`);
       }
     } catch {
-      setInfoMessage("No se encontraron actos procesales previos para este DNI. Puedes ingresar los datos manualmente.");
+      setInfoMessage("No se encontraron expedientes previos para este DNI. Puedes ingresar los datos manualmente.");
     }
   };
 
@@ -211,7 +211,7 @@ export function PersonaModal({
           </div>
         )}
 
-        {/* DNI con Búsqueda en Actos Procesales */}
+        {/* DNI con Búsqueda en Expedientes */}
         <div className="space-y-1.5 text-left">
           <label className="block text-sm font-semibold text-carbon">
             Documento de Identidad (DNI) *
@@ -235,7 +235,7 @@ export function PersonaModal({
               onClick={() => handleBuscarDni()}
               isLoading={isSearchingDni}
               className="h-9 px-3 text-xs shrink-0 font-bold"
-              title="Consultar datos en actos procesales"
+              title="Consultar datos en expedientes"
             >
               <Search className="w-3.5 h-3.5 mr-1 text-olivo" />
               Buscar Datos
