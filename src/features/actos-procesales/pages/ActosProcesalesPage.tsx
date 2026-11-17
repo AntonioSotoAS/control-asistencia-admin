@@ -21,8 +21,8 @@ export function ActosProcesalesPage() {
   const [docId, setDocId] = useState("");
   const [expediente, setExpediente] = useState("");
   const [soloSinDni, setSoloSinDni] = useState(false);
-  const [fechaInicio, setFechaInicio] = useState("");
-  const [fechaFin, setFechaFin] = useState("");
+  const [fechaDesde, setFechaDesde] = useState("");
+  const [fechaHasta, setFechaHasta] = useState("");
 
   const debouncedDocId = useDebounce(docId, 400);
   const debouncedExpediente = useDebounce(expediente, 400);
@@ -33,13 +33,13 @@ export function ActosProcesalesPage() {
   const [selectedDocId, setSelectedDocId] = useState<string | undefined>(undefined);
   const [notification, setNotification] = useState<string | null>(null);
 
-  // Fallback si la fecha inicio y fecha fin coinciden, o solo se indica una fecha
+  // Fallback si la fecha desde y fecha hasta coinciden, o solo se indica una fecha
   const fallbackSingleDate =
-    fechaInicio && fechaFin && fechaInicio === fechaFin
-      ? fechaInicio
-      : fechaInicio && !fechaFin
-      ? fechaInicio
-      : undefined;
+    fechaDesde && fechaHasta && fechaDesde === fechaHasta
+      ? fechaDesde
+      : fechaDesde && !fechaHasta
+        ? fechaDesde
+        : undefined;
 
   const { data, isLoading, isFetching, isError, error, refetch } = useGetActosProcesalesQuery({
     page,
@@ -47,8 +47,10 @@ export function ActosProcesalesPage() {
     x_doc_id: debouncedDocId.trim() || undefined,
     expediente: debouncedExpediente.trim() || undefined,
     sin_dni: soloSinDni || undefined,
-    fecha_inicio: fechaInicio || undefined,
-    fecha_fin: fechaFin || undefined,
+    fecha_inicio: fechaDesde || undefined,
+    fecha_fin: fechaHasta || undefined,
+    desde: fechaDesde || undefined,
+    hasta: fechaHasta || undefined,
     f_ingreso_acto: fallbackSingleDate,
   });
 
@@ -72,12 +74,14 @@ export function ActosProcesalesPage() {
     setDocId("");
     setExpediente("");
     setSoloSinDni(false);
-    setFechaInicio("");
-    setFechaFin("");
+    setFechaDesde("");
+    setFechaHasta("");
     setPage(1);
   };
 
-  const hasActiveFilters = Boolean(docId || expediente || soloSinDni || fechaInicio || fechaFin);
+  const hasActiveFilters = Boolean(
+    docId || expediente || soloSinDni || fechaDesde || fechaHasta
+  );
 
   return (
     <div className="space-y-6">
@@ -211,38 +215,74 @@ export function ActosProcesalesPage() {
             </span>
           </div>
 
-          {/* Fecha Inicio */}
+          {/* Fecha Desde */}
           <div className="lg:col-span-2">
-            <label className="text-[11px] font-bold text-olivo uppercase block mb-1">
-              Fecha Inicio
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px] font-bold text-olivo uppercase block">
+                Fecha Desde
+              </label>
+              {fechaDesde && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFechaDesde("");
+                    setPage(1);
+                  }}
+                  className="text-[10px] text-olivo hover:text-rose-600 font-semibold"
+                  title="Quitar fecha desde"
+                >
+                  Limpiar
+                </button>
+              )}
+            </div>
             <input
               type="date"
-              value={fechaInicio}
+              value={fechaDesde}
+              max={fechaHasta || undefined}
               onChange={(e) => {
-                setFechaInicio(e.target.value);
+                setFechaDesde(e.target.value);
                 setPage(1);
               }}
               className="w-full text-xs font-semibold bg-suave/60 border border-linea rounded-field px-3 py-2 text-carbon focus:outline-none focus:border-guinda focus:bg-white transition"
             />
-            <span className="text-[10px] text-transparent block mt-1.5 select-none">-</span>
+            <span className="text-[10px] text-olivo/80 block mt-1.5">
+              Desde (ingreso)
+            </span>
           </div>
 
-          {/* Fecha Fin */}
+          {/* Fecha Hasta */}
           <div className="lg:col-span-2">
-            <label className="text-[11px] font-bold text-olivo uppercase block mb-1">
-              Fecha Fin
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px] font-bold text-olivo uppercase block">
+                Fecha Hasta
+              </label>
+              {fechaHasta && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFechaHasta("");
+                    setPage(1);
+                  }}
+                  className="text-[10px] text-olivo hover:text-rose-600 font-semibold"
+                  title="Quitar fecha hasta"
+                >
+                  Limpiar
+                </button>
+              )}
+            </div>
             <input
               type="date"
-              value={fechaFin}
+              value={fechaHasta}
+              min={fechaDesde || undefined}
               onChange={(e) => {
-                setFechaFin(e.target.value);
+                setFechaHasta(e.target.value);
                 setPage(1);
               }}
               className="w-full text-xs font-semibold bg-suave/60 border border-linea rounded-field px-3 py-2 text-carbon focus:outline-none focus:border-guinda focus:bg-white transition"
             />
-            <span className="text-[10px] text-transparent block mt-1.5 select-none">-</span>
+            <span className="text-[10px] text-olivo/80 block mt-1.5">
+              Hasta (ingreso)
+            </span>
           </div>
 
           {/* Limpiar Filtros */}
