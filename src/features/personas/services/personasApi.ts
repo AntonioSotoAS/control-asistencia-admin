@@ -8,11 +8,20 @@ import type {
 
 export const personasApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getPersonas: builder.query<Persona[], string | void>({
-      query: (q) => ({
-        url: "/personas",
-        params: q && q.trim() ? { q: q.trim() } : undefined,
-      }),
+    getPersonas: builder.query<Persona[], { q?: string; rol?: string } | string | void>({
+      query: (arg) => {
+        const params: Record<string, string> = {};
+        if (typeof arg === "string" && arg.trim()) {
+          params.q = arg.trim();
+        } else if (arg && typeof arg === "object") {
+          if (arg.q && arg.q.trim()) params.q = arg.q.trim();
+          if (arg.rol && arg.rol !== "TODOS" && arg.rol.trim()) params.rol = arg.rol.trim();
+        }
+        return {
+          url: "/personas",
+          params: Object.keys(params).length > 0 ? params : undefined,
+        };
+      },
       transformResponse: (response: unknown): Persona[] => {
         if (Array.isArray(response)) {
           return response as Persona[];

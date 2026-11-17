@@ -7,11 +7,20 @@ import type {
 
 export const usuariosApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getUsuarios: builder.query<Usuario[], string | void>({
-      query: (q) => ({
-        url: "/usuarios",
-        params: q && q.trim() ? { q: q.trim() } : undefined,
-      }),
+    getUsuarios: builder.query<Usuario[], { q?: string; rol?: string } | string | void>({
+      query: (arg) => {
+        const params: Record<string, string> = {};
+        if (typeof arg === "string" && arg.trim()) {
+          params.q = arg.trim();
+        } else if (arg && typeof arg === "object") {
+          if (arg.q && arg.q.trim()) params.q = arg.q.trim();
+          if (arg.rol && arg.rol !== "TODOS" && arg.rol.trim()) params.rol = arg.rol.trim();
+        }
+        return {
+          url: "/usuarios",
+          params: Object.keys(params).length > 0 ? params : undefined,
+        };
+      },
       transformResponse: (response: unknown): Usuario[] => {
         if (Array.isArray(response)) {
           return response as Usuario[];

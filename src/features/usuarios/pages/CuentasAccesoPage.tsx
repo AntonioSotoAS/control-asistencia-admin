@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router";
 import { UsuariosTable } from "../components/UsuariosTable";
 import { UsuarioModal } from "../components/UsuarioModal";
@@ -14,6 +14,7 @@ import {
   Search,
   RefreshCw,
   CheckCircle2,
+  Filter,
 } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import { useDebounce } from "@/shared/hooks/useDebounce";
@@ -62,6 +63,7 @@ export function CuentasAccesoPage({ defaultTab = "cuentas" }: CuentasAccesoPageP
   };
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [rolFilter, setRolFilter] = useState<string>("TODOS");
   const debouncedQuery = useDebounce(searchQuery, 400);
 
   // Notificaciones Toast
@@ -73,6 +75,11 @@ export function CuentasAccesoPage({ defaultTab = "cuentas" }: CuentasAccesoPageP
     }, 4500);
   };
 
+  const queryArg = {
+    q: debouncedQuery || undefined,
+    rol: rolFilter !== "TODOS" ? rolFilter : undefined,
+  };
+
   // Consultas RTK Query
   const {
     data: usuarios = [],
@@ -81,7 +88,7 @@ export function CuentasAccesoPage({ defaultTab = "cuentas" }: CuentasAccesoPageP
     isError: isErrorUsuarios,
     error: errorUsuarios,
     refetch: refetchUsuarios,
-  } = useGetUsuariosQuery(activeTab === "cuentas" ? debouncedQuery : undefined);
+  } = useGetUsuariosQuery(activeTab === "cuentas" ? queryArg : undefined);
 
   const {
     data: personas = [],
@@ -90,7 +97,51 @@ export function CuentasAccesoPage({ defaultTab = "cuentas" }: CuentasAccesoPageP
     isError: isErrorPersonas,
     error: errorPersonas,
     refetch: refetchPersonas,
-  } = useGetPersonasQuery(activeTab === "personas" ? debouncedQuery : undefined);
+  } = useGetPersonasQuery(activeTab === "personas" ? queryArg : undefined);
+
+  // Conteo de usuarios por rol para las insignias
+  const roleCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      TODOS: usuarios.length,
+      beneficiario: 0,
+      asistente: 0,
+      admin: 0,
+      juez: 0,
+    };
+    usuarios.forEach((u) => {
+      const r = String(u.rol || "").toLowerCase();
+      if (r === "beneficiario") counts.beneficiario++;
+      else if (r === "asistente") counts.asistente++;
+      else if (r === "admin" || r === "administrador" || r === "superadmin") counts.admin++;
+      else if (r === "juez") counts.juez++;
+    });
+    return counts;
+  }, [usuarios]);
+
+  // Filtrado reactivo en cliente para respuesta instantánea
+  const usuariosFiltrados = useMemo(() => {
+    if (!rolFilter || rolFilter === "TODOS") return usuarios;
+    const target = rolFilter.toLowerCase();
+    return usuarios.filter((u) => {
+      const r = String(u.rol || (u as any).role || "").toLowerCase();
+      if (target === "admin") {
+        return r === "admin" || r === "administrador" || r === "superadmin";
+      }
+      return r === target || r.includes(target);
+    });
+  }, [usuarios, rolFilter]);
+
+  const personasFiltradas = useMemo(() => {
+    if (!rolFilter || rolFilter === "TODOS") return personas;
+    const target = rolFilter.toLowerCase();
+    return personas.filter((p) => {
+      const r = String(p.usuario?.rol || "").toLowerCase();
+      if (target === "admin") {
+        return r === "admin" || r === "administrador" || r === "superadmin";
+      }
+      return r === target || r.includes(target);
+    });
+  }, [personas, rolFilter]);
 
   // Mutations Usuarios
   const [crearUsuario, { isLoading: isCreatingUsuario }] = useCrearUsuarioMutation();
@@ -245,62 +296,110 @@ export function CuentasAccesoPage({ defaultTab = "cuentas" }: CuentasAccesoPageP
           </div>
         </div>
 
-        {/* Pestañas Segmentadas: Cuentas de Acceso vs Padrón de Personas */}
-        <div className="flex items-center gap-2 pt-3 border-t border-linea/60">
-          <button
-            type="button"
-            onClick={() => handleTabChange("cuentas")}
-            className={cn(
-              "flex items-center gap-2 px-3.5 py-2 rounded-field text-xs font-bold transition-all cursor-pointer",
-              activeTab === "cuentas"
-                ? "bg-[#562599] text-white shadow-xs"
-                : "bg-suave/70 text-carbon/70 hover:text-carbon hover:bg-suave border border-linea/60"
-            )}
-          >
-            <UserCog className="w-4 h-4" />
-            <span>Cuentas de Usuario</span>
-            <span
+        {/* Pestañas Segmentadas y Filtro por Rol del Sistema */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pt-3 border-t border-linea/60">
+          {/* Pestañas: Cuentas vs Personas */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleTabChange("cuentas")}
               className={cn(
-                "px-1.5 py-0.5 rounded-full text-[10px] font-mono leading-none",
+                "flex items-center gap-2 px-3.5 py-2 rounded-field text-xs font-bold transition-all cursor-pointer",
                 activeTab === "cuentas"
-                  ? "bg-white/20 text-white"
-                  : "bg-white text-olivo border border-linea/50"
+                  ? "bg-[#562599] text-white shadow-xs"
+                  : "bg-suave/70 text-carbon/70 hover:text-carbon hover:bg-suave border border-linea/60"
               )}
             >
-              {usuarios.length}
-            </span>
-          </button>
+              <UserCog className="w-4 h-4" />
+              <span>Cuentas de Usuario</span>
+              <span
+                className={cn(
+                  "px-1.5 py-0.5 rounded-full text-[10px] font-mono leading-none",
+                  activeTab === "cuentas"
+                    ? "bg-white/20 text-white"
+                    : "bg-white text-olivo border border-linea/50"
+                )}
+              >
+                {usuariosFiltrados.length}
+              </span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => handleTabChange("personas")}
-            className={cn(
-              "flex items-center gap-2 px-3.5 py-2 rounded-field text-xs font-bold transition-all cursor-pointer",
-              activeTab === "personas"
-                ? "bg-[#562599] text-white shadow-xs"
-                : "bg-suave/70 text-carbon/70 hover:text-carbon hover:bg-suave border border-linea/60"
-            )}
-          >
-            <UserCheck className="w-4 h-4" />
-            <span>Padrón de Personas</span>
-            <span
+            <button
+              type="button"
+              onClick={() => handleTabChange("personas")}
               className={cn(
-                "px-1.5 py-0.5 rounded-full text-[10px] font-mono leading-none",
+                "flex items-center gap-2 px-3.5 py-2 rounded-field text-xs font-bold transition-all cursor-pointer",
                 activeTab === "personas"
-                  ? "bg-white/20 text-white"
-                  : "bg-white text-olivo border border-linea/50"
+                  ? "bg-[#562599] text-white shadow-xs"
+                  : "bg-suave/70 text-carbon/70 hover:text-carbon hover:bg-suave border border-linea/60"
               )}
             >
-              {personas.length}
-            </span>
-          </button>
+              <UserCheck className="w-4 h-4" />
+              <span>Padrón de Personas</span>
+              <span
+                className={cn(
+                  "px-1.5 py-0.5 rounded-full text-[10px] font-mono leading-none",
+                  activeTab === "personas"
+                    ? "bg-white/20 text-white"
+                    : "bg-white text-olivo border border-linea/50"
+                )}
+              >
+                {personasFiltradas.length}
+              </span>
+            </button>
+          </div>
+
+          {/* Filtro por Rol del Sistema (Beneficiario, Asistente, Admin, etc.) */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
+            <div className="flex items-center gap-1 text-[11px] font-bold text-olivo uppercase tracking-wider mr-1 shrink-0">
+              <Filter className="w-3.5 h-3.5 text-olivo" />
+              <span>Rol:</span>
+            </div>
+
+            {[
+              { id: "TODOS", label: "Todos", count: usuarios.length },
+              { id: "beneficiario", label: "Beneficiario", count: roleCounts.beneficiario },
+              { id: "asistente", label: "Asistente", count: roleCounts.asistente },
+              { id: "admin", label: "Admin", count: roleCounts.admin },
+              { id: "juez", label: "Juez", count: roleCounts.juez },
+            ].map((r) => {
+              const isSelected = rolFilter === r.id;
+              return (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => setRolFilter(r.id)}
+                  className={cn(
+                    "px-2.5 py-1.5 rounded-field text-xs font-bold transition flex items-center gap-1.5 shrink-0 cursor-pointer",
+                    isSelected
+                      ? "bg-[#562599] text-white shadow-xs"
+                      : "bg-suave/80 text-carbon/75 hover:bg-suave hover:text-carbon border border-linea/60"
+                  )}
+                >
+                  <span>{r.label}</span>
+                  {activeTab === "cuentas" && (
+                    <span
+                      className={cn(
+                        "px-1.5 py-0.5 rounded-full text-[10px] font-mono leading-none",
+                        isSelected
+                          ? "bg-white/20 text-white"
+                          : "bg-white/90 text-olivo border border-linea/40"
+                      )}
+                    >
+                      {r.count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
       {/* Contenido de la Pestaña Activa */}
       {activeTab === "cuentas" ? (
         <UsuariosTable
-          usuarios={usuarios}
+          usuarios={usuariosFiltrados}
           isLoading={isLoadingUsuarios}
           isError={isErrorUsuarios}
           error={errorUsuarios}
@@ -310,7 +409,7 @@ export function CuentasAccesoPage({ defaultTab = "cuentas" }: CuentasAccesoPageP
         />
       ) : (
         <PersonasTable
-          personas={personas}
+          personas={personasFiltradas}
           isLoading={isLoadingPersonas}
           isError={isErrorPersonas}
           error={errorPersonas}
