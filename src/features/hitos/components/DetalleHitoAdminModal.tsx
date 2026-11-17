@@ -104,7 +104,7 @@ export function DetalleHitoAdminModal({
                 }}
                 leftIcon={<CalendarPlus className="w-4 h-4 text-guinda" />}
               >
-                Agendar Fechas
+                {sesiones.length > 0 ? "Modificar Fechas" : "Agendar Fechas"}
               </Button>
             )}
 

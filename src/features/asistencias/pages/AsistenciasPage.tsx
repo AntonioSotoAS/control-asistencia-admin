@@ -1,6 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
 import { AsistenciasTable } from "../components/AsistenciasTable";
 import { RegistroAsistenciaModal } from "../components/RegistroAsistenciaModal";
+import { EditarFechaSesionModal } from "../components/EditarFechaSesionModal";
+import { AgendarFechasModal } from "@/features/hitos/components/AgendarFechasModal";
 import { Button, Badge } from "@/components/ui";
 import {
   Search,
@@ -11,22 +13,31 @@ import {
   Building2,
   FileText,
   Clock,
-  QrCode,
   Layers,
   ArrowRight,
   X,
   AlertCircle,
   CheckCircle,
+  CalendarDays,
+  Upload,
 } from "lucide-react";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import {
   useGetSesionesQuery,
   useRegistrarSesionMutation,
+  useReprogramarFechaSesionMutation,
 } from "../services/asistenciasApi";
 import { useGetBeneficiariosQuery } from "@/features/beneficiarios/services/beneficiariosApi";
-import { useGetHitosAdminQuery } from "@/features/hitos/services/hitosApi";
+import {
+  useGetHitosAdminQuery,
+  useEditarFechasHitoMutation,
+} from "@/features/hitos/services/hitosApi";
 import type { Beneficiario } from "@/features/beneficiarios/types/beneficiario.types";
-import type { RegistrarSesionPayload } from "../types/asistencia.types";
+import type {
+  RegistrarSesionPayload,
+  SesionAsistencia,
+  Asistencia,
+} from "../types/asistencia.types";
 
 export function AsistenciasPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,7 +53,20 @@ export function AsistenciasPage() {
   // Modo de vista: "jerarquico" (por persona e hito) o "global" (todas las sesiones)
   const [viewMode, setViewMode] = useState<"jerarquico" | "global">("jerarquico");
 
+  // Modales
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditHitoModalOpen, setIsEditHitoModalOpen] = useState(false);
+  const [sesionForRegistro, setSesionForRegistro] = useState<
+    | (Partial<SesionAsistencia> & {
+        personaNombre?: string;
+        personaDni?: string;
+        hitoNombre?: string;
+      })
+    | null
+  >(null);
+  const [sesionForEditFecha, setSesionForEditFecha] =
+    useState<SesionAsistencia | null>(null);
+
   const [notification, setNotification] = useState<string | null>(null);
 
   // 1. Consulta de beneficiarios para búsqueda por Nombre o DNI
@@ -98,6 +122,12 @@ export function AsistenciasPage() {
   const [registrarSesion, { isLoading: isRegistering }] =
     useRegistrarSesionMutation();
 
+  const [reprogramarFechaSesion, { isLoading: isReprogramando }] =
+    useReprogramarFechaSesionMutation();
+
+  const [editarFechasHito, { isLoading: isEditandoHitoFechas }] =
+    useEditarFechasHitoMutation();
+
   const showNotification = (msg: string) => {
     setNotification(msg);
     setTimeout(() => {
@@ -107,11 +137,27 @@ export function AsistenciasPage() {
 
   const handleRegistrar = async (payload: RegistrarSesionPayload) => {
     await registrarSesion(payload).unwrap();
-    showNotification("Asistencia registrada exitosamente en el servidor.");
+    showNotification("Marcación y prueba registradas exitosamente en el servidor.");
     refetchSesiones();
     if (selectedBeneficiario) {
       refetchHitos();
     }
+  };
+
+  const handleReprogramarFecha = async ({ id, fecha }: { id: number; fecha: string }) => {
+    await reprogramarFechaSesion({ id, fecha }).unwrap();
+    showNotification(`Fecha de la sesión #${id} actualizada exitosamente a ${fecha}.`);
+    refetchSesiones();
+    if (selectedBeneficiario) {
+      refetchHitos();
+    }
+  };
+
+  const handleSaveHitoFechas = async ({ id, fechas }: { id: number; fechas: string[] }) => {
+    await editarFechasHito({ id, fechas }).unwrap();
+    showNotification(`Fechas del hito #${id} actualizadas exitosamente (${fechas.length} sesiones).`);
+    refetchHitos();
+    refetchSesiones();
   };
 
   // Hito activo actualmente seleccionado
@@ -120,11 +166,13 @@ export function AsistenciasPage() {
   }, [hitosBeneficiario, selectedHitoId]);
 
   // Sesiones asistidas vs totales del hito seleccionado
-  const sesionesTotalesHito = currentHito?.sesiones_totales || currentHito?.sesiones_requeridas || sesiones.length;
+  const sesionesTotalesHito =
+    currentHito?.sesiones_totales || currentHito?.sesiones_requeridas || sesiones.length;
   const sesionesAsistidasHito = sesiones.filter((s) => s.asistio).length;
-  const porcentajeAvanceHito = sesionesTotalesHito > 0
-    ? Math.min(100, Math.round((sesionesAsistidasHito / sesionesTotalesHito) * 100))
-    : 0;
+  const porcentajeAvanceHito =
+    sesionesTotalesHito > 0
+      ? Math.min(100, Math.round((sesionesAsistidasHito / sesionesTotalesHito) * 100))
+      : 0;
 
   const handleSelectBeneficiario = (b: Beneficiario) => {
     setSelectedBeneficiario(b);
@@ -135,6 +183,40 @@ export function AsistenciasPage() {
   const handleClearBeneficiario = () => {
     setSelectedBeneficiario(null);
     setSelectedHitoId(null);
+  };
+
+  const handleOpenRegistrarGeneral = () => {
+    setSesionForRegistro(
+      selectedBeneficiario
+        ? {
+            persona_id: selectedBeneficiario.id,
+            hito_id: selectedHitoId ?? undefined,
+            personaNombre: selectedBeneficiario.nombre,
+            personaDni: selectedBeneficiario.dni,
+            hitoNombre: currentHito?.nombre,
+          }
+        : null
+    );
+    setIsModalOpen(true);
+  };
+
+  const handleMarcarSesionFila = (sesion: Asistencia) => {
+    setSesionForRegistro({
+      ...sesion,
+      persona_id: sesion.persona_id || selectedBeneficiario?.id,
+      hito_id: sesion.hito_id || selectedHitoId || undefined,
+      numero: sesion.numero,
+      fecha: sesion.fecha,
+      tipo: sesion.tipo || "presencial",
+      personaNombre: sesion.beneficiarioNombre || selectedBeneficiario?.nombre,
+      personaDni: sesion.beneficiarioDni || selectedBeneficiario?.dni,
+      hitoNombre: sesion.hitoNombre || currentHito?.nombre,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleEditarFechaFila = (sesion: Asistencia) => {
+    setSesionForEditFecha(sesion);
   };
 
   return (
@@ -159,7 +241,7 @@ export function AsistenciasPage() {
             </h2>
           </div>
           <p className="text-xs text-olivo">
-            Busca por Nombre o DNI, selecciona el Hito del beneficiario y visualiza el cumplimiento de sus sesiones.
+            Busca por Nombre o DNI, modifica las fechas de las sesiones y sube comprobantes de asistencia válidos para asistentes y jueces.
           </p>
         </div>
 
@@ -168,20 +250,22 @@ export function AsistenciasPage() {
           <div className="flex items-center bg-suave/80 p-1 rounded-field border border-linea text-xs">
             <button
               onClick={() => setViewMode("jerarquico")}
-              className={`px-3 py-1.5 rounded-md font-bold transition flex items-center gap-1.5 ${viewMode === "jerarquico"
-                ? "bg-white text-carbon shadow-xs"
-                : "text-olivo hover:text-carbon"
-                }`}
+              className={`px-3 py-1.5 rounded-md font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                viewMode === "jerarquico"
+                  ? "bg-white text-carbon shadow-xs"
+                  : "text-olivo hover:text-carbon"
+              }`}
             >
               <User className="w-3.5 h-3.5" />
               Por Beneficiario e Hito
             </button>
             <button
               onClick={() => setViewMode("global")}
-              className={`px-3 py-1.5 rounded-md font-bold transition flex items-center gap-1.5 ${viewMode === "global"
-                ? "bg-white text-carbon shadow-xs"
-                : "text-olivo hover:text-carbon"
-                }`}
+              className={`px-3 py-1.5 rounded-md font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                viewMode === "global"
+                  ? "bg-white text-carbon shadow-xs"
+                  : "text-olivo hover:text-carbon"
+              }`}
             >
               <Layers className="w-3.5 h-3.5" />
               Todas las Sesiones
@@ -204,11 +288,11 @@ export function AsistenciasPage() {
           <Button
             variant="primary"
             size="sm"
-            onClick={() => setIsModalOpen(true)}
-            leftIcon={<QrCode className="w-4 h-4" />}
-            className="font-bold shadow-xs"
+            onClick={handleOpenRegistrarGeneral}
+            leftIcon={<Upload className="w-4 h-4" />}
+            className="font-bold shadow-xs bg-[#562599] hover:bg-[#471e7f] text-white"
           >
-            Marcar Asistencia
+            Marcar Asistencia / Subir Prueba
           </Button>
         </div>
       </div>
@@ -357,7 +441,7 @@ export function AsistenciasPage() {
 
               {/* Selector de Hitos del Beneficiario */}
               <div className="bg-white p-4 rounded-tile border border-linea/80 shadow-xs space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-carbon flex items-center gap-1.5">
                     <Calendar className="w-4 h-4 text-guinda" />
                     2. Seleccionar Hito de Control ({hitosBeneficiario.length})
@@ -382,10 +466,11 @@ export function AsistenciasPage() {
                         <button
                           key={hito.id ?? `hito-${hito.persona_id}`}
                           onClick={() => hito.id && setSelectedHitoId(hito.id)}
-                          className={`p-3.5 rounded-tile border text-left transition flex flex-col justify-between ${isSelected
-                            ? "bg-guinda/5 border-guinda shadow-xs ring-1 ring-guinda"
-                            : "bg-white border-linea hover:border-linea/80 hover:bg-suave/40"
-                            }`}
+                          className={`p-3.5 rounded-tile border text-left transition flex flex-col justify-between cursor-pointer ${
+                            isSelected
+                              ? "bg-guinda/5 border-guinda shadow-xs ring-1 ring-guinda"
+                              : "bg-white border-linea hover:border-linea/80 hover:bg-suave/40"
+                          }`}
                         >
                           <div>
                             <div className="flex items-center justify-between gap-2">
@@ -397,8 +482,8 @@ export function AsistenciasPage() {
                                   hito.revision === "valida"
                                     ? "success"
                                     : hito.revision === "observada"
-                                      ? "danger"
-                                      : "warning"
+                                    ? "danger"
+                                    : "warning"
                                 }
                               >
                                 {hito.revision}
@@ -425,26 +510,40 @@ export function AsistenciasPage() {
                   </div>
                 )}
 
-                {/* Resumen de Asistencia del Hito Seleccionado */}
+                {/* Resumen de Asistencia del Hito Seleccionado con Botón para Modificar Fechas */}
                 {currentHito && (
-                  <div className="p-4 rounded-field bg-suave/60 border border-linea space-y-2 mt-2">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                      <span className="font-bold text-carbon">
-                        Avance del Hito: {sesionesAsistidasHito} de {sesionesTotalesHito} sesiones asistidas ({porcentajeAvanceHito}%)
-                      </span>
-                      <span className="text-[11px] font-semibold text-olivo">
-                        Estado: <strong className="text-carbon uppercase">{currentHito.estado}</strong> | Revisión: <strong className="text-carbon uppercase">{currentHito.revision}</strong>
-                      </span>
+                  <div className="p-4 rounded-field bg-suave/60 border border-linea space-y-3 mt-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                      <div>
+                        <span className="font-extrabold text-sm text-carbon block">
+                          {currentHito.nombre || `Hito #${currentHito.id}`} — Avance: {sesionesAsistidasHito} de {sesionesTotalesHito} sesiones asistidas ({porcentajeAvanceHito}%)
+                        </span>
+                        <span className="text-[11px] font-semibold text-olivo">
+                          Estado: <strong className="text-carbon uppercase">{currentHito.estado}</strong> | Revisión: <strong className="text-carbon uppercase">{currentHito.revision}</strong>
+                        </span>
+                      </div>
+
+                      {/* Botón para Modificar Fechas de las Sesiones del Hito */}
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => setIsEditHitoModalOpen(true)}
+                        leftIcon={<CalendarDays className="w-4 h-4 text-white" />}
+                        className="bg-[#562599] hover:bg-[#471e7f] text-white font-bold shrink-0 shadow-xs"
+                      >
+                        Modificar Fechas de Sesiones
+                      </Button>
                     </div>
 
                     <div className="w-full h-2.5 bg-linea/50 rounded-full overflow-hidden">
                       <div
-                        className={`h-full rounded-full transition-all duration-300 ${porcentajeAvanceHito >= 100
-                          ? "bg-emerald-600"
-                          : porcentajeAvanceHito >= 50
+                        className={`h-full rounded-full transition-all duration-300 ${
+                          porcentajeAvanceHito >= 100
+                            ? "bg-emerald-600"
+                            : porcentajeAvanceHito >= 50
                             ? "bg-guinda"
                             : "bg-amber-600"
-                          }`}
+                        }`}
                         style={{ width: `${Math.min(100, Math.max(porcentajeAvanceHito, 4))}%` }}
                       />
                     </div>
@@ -470,6 +569,8 @@ export function AsistenciasPage() {
                   <AsistenciasTable
                     asistencias={sesiones}
                     isLoading={isLoadingSesiones}
+                    onMarcarSesion={handleMarcarSesionFila}
+                    onEditarFecha={handleEditarFechaFila}
                   />
                 </div>
               </div>
@@ -498,18 +599,45 @@ export function AsistenciasPage() {
             <AsistenciasTable
               asistencias={sesiones}
               isLoading={isLoadingSesiones}
+              onMarcarSesion={handleMarcarSesionFila}
+              onEditarFecha={handleEditarFechaFila}
             />
           </div>
         </div>
       )}
 
-      {/* Modal de Marcación de Asistencia */}
+      {/* Modal de Marcación de Asistencia y Subida de Pruebas */}
       <RegistroAsistenciaModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSesionForRegistro(null);
+        }}
+        initialData={sesionForRegistro}
         onRegistrar={handleRegistrar}
         isLoading={isRegistering}
       />
+
+      {/* Modal para Modificar Fecha de una Sesión Individual */}
+      <EditarFechaSesionModal
+        isOpen={Boolean(sesionForEditFecha)}
+        onClose={() => setSesionForEditFecha(null)}
+        sesion={sesionForEditFecha}
+        onSave={handleReprogramarFecha}
+        isLoading={isReprogramando}
+      />
+
+      {/* Modal para Modificar Fechas del Hito Completo */}
+      {currentHito && (
+        <AgendarFechasModal
+          isOpen={isEditHitoModalOpen}
+          onClose={() => setIsEditHitoModalOpen(false)}
+          hito={currentHito}
+          onAgendar={async () => {}}
+          onEditarFechas={handleSaveHitoFechas}
+          isLoading={isEditandoHitoFechas}
+        />
+      )}
     </div>
   );
 }

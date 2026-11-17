@@ -100,6 +100,9 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
             codigosPermitidos.includes("actosprocesales")
           );
         }
+        if ((codigo === "asistencias" || codigo === "hitos") && (rol === "juez" || rol === "asistente" || rol === "admin" || rol === "superadmin")) {
+          return true;
+        }
         return codigosPermitidos.includes(codigo);
       }
 

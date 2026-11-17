@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Input } from "@/components/ui";
-import { Calendar, AlertCircle, Clock, User, Layers } from "lucide-react";
+import { Calendar, AlertCircle, User, Layers } from "lucide-react";
 import type { SesionAsistencia, ApiErrorResponse } from "../types/asistencia.types";
 
 interface EditarFechaSesionModalProps {
