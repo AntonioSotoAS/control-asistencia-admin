@@ -111,10 +111,43 @@ export const asistenciasApi = baseApi.injectEndpoints({
     }),
 
     registrarSesion: builder.mutation<SesionAsistencia, RegistrarSesionPayload>({
-      query: (body) => ({
-        url: "/sesiones",
-        method: "POST",
-        body,
+      query: (body) => {
+        const formData = new FormData();
+        formData.append("fecha", body.fecha);
+        formData.append("tipo", body.tipo || "presencial");
+        formData.append("asistio", String(body.asistio ?? true));
+
+        if (body.persona_id) formData.append("persona_id", String(body.persona_id));
+        if (body.hito_id || body.hitoId) formData.append("hito_id", String(body.hito_id || body.hitoId));
+        if (body.numero) formData.append("numero", String(body.numero));
+        if (body.hora) formData.append("hora", body.hora);
+
+        const notas = body.notas || body.observacion;
+        if (notas) formData.append("notas", notas);
+        if (body.estado) formData.append("estado", body.estado);
+        if (body.metodo) formData.append("metodo", body.metodo);
+
+        if (body.comprobante instanceof File) {
+          formData.append("comprobante", body.comprobante);
+        }
+
+        return {
+          url: "/sesiones",
+          method: "POST",
+          body: formData,
+        };
+      },
+      invalidatesTags: [
+        { type: "Sesion", id: "LIST" },
+        { type: "Hito", id: "LIST" },
+      ],
+    }),
+
+    reprogramarFechaSesion: builder.mutation<SesionAsistencia, { id: number; fecha: string }>({
+      query: ({ id, fecha }) => ({
+        url: `/sesiones/${id}/fecha`,
+        method: "PUT",
+        body: { fecha },
       }),
       invalidatesTags: [
         { type: "Sesion", id: "LIST" },
@@ -127,8 +160,10 @@ export const asistenciasApi = baseApi.injectEndpoints({
 export const {
   useGetSesionesQuery,
   useRegistrarSesionMutation,
+  useReprogramarFechaSesionMutation,
 } = asistenciasApi;
 
 // Aliases para máxima compatibilidad con componentes existentes
 export const useGetAsistenciasQuery = useGetSesionesQuery;
 export const useRegistrarAsistenciaMutation = useRegistrarSesionMutation;
+export const useReprogramarFechaAsistenciaMutation = useReprogramarFechaSesionMutation;

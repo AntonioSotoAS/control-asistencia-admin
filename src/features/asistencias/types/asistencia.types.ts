@@ -53,14 +53,25 @@ export type Asistencia = SesionAsistencia;
 
 export interface RegistrarSesionPayload {
   persona_id?: number;
+  hito_id?: number;
   sesion_id?: number;
+  numero?: number;
   fecha: string;
   hora?: string;
+  tipo?: "presencial" | "virtual" | string;
+  asistio?: boolean;
+  notas?: string;
+  observacion?: string;
   estado?: EstadoAsistencia;
   metodo?: MetodoAsistencia;
-  observacion?: string;
   dni?: string;
   hitoId?: string | number;
+  comprobante?: File | null;
+}
+
+export interface ReprogramarFechaSesionPayload {
+  id: number;
+  fecha: string;
 }
 
 export type RegistroAsistenciaPayload = RegistrarSesionPayload;

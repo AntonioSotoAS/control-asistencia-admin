@@ -7,17 +7,21 @@ import {
   TableCell,
   Badge,
 } from "@/components/ui";
-import { CalendarCheck } from "lucide-react";
+import { CalendarCheck, CalendarClock, Upload } from "lucide-react";
 import type { Asistencia } from "../types/asistencia.types";
 
 interface AsistenciasTableProps {
   asistencias: Asistencia[];
   isLoading?: boolean;
+  onMarcarSesion?: (sesion: Asistencia) => void;
+  onEditarFecha?: (sesion: Asistencia) => void;
 }
 
 export function AsistenciasTable({
   asistencias,
   isLoading,
+  onMarcarSesion,
+  onEditarFecha,
 }: AsistenciasTableProps) {
   if (isLoading) {
     return (
@@ -51,7 +55,8 @@ export function AsistenciasTable({
           <TableHead>Hito de Control</TableHead>
           <TableHead>Fecha y Tipo</TableHead>
           <TableHead>Comprobante / Notas</TableHead>
-          <TableHead className="text-right">¿Asistió?</TableHead>
+          <TableHead className="w-24">¿Asistió?</TableHead>
+          <TableHead className="text-right">Acciones</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -138,7 +143,7 @@ export function AsistenciasTable({
               </TableCell>
 
               {/* ¿Asistió? */}
-              <TableCell className="text-right">
+              <TableCell>
                 {asistio ? (
                   <Badge variant="success" className="gap-1 font-bold">
                     ✓ Asistió
@@ -148,6 +153,33 @@ export function AsistenciasTable({
                     Programada
                   </Badge>
                 )}
+              </TableCell>
+
+              {/* Acciones */}
+              <TableCell className="text-right">
+                <div className="flex items-center justify-end gap-1.5">
+                  {onEditarFecha && (
+                    <button
+                      type="button"
+                      onClick={() => onEditarFecha(item)}
+                      className="p-1.5 rounded-lg border border-linea hover:bg-suave text-olivo hover:text-carbon transition cursor-pointer"
+                      title="Modificar fecha de la sesión (PUT /api/sesiones/{id}/fecha)"
+                    >
+                      <CalendarClock className="w-4 h-4 text-olivo" />
+                    </button>
+                  )}
+                  {onMarcarSesion && (
+                    <button
+                      type="button"
+                      onClick={() => onMarcarSesion(item)}
+                      className="px-2.5 py-1.5 rounded-lg border border-[#562599]/30 bg-[#562599]/5 hover:bg-[#562599] text-[#562599] hover:text-white font-bold text-xs transition cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                      title="Registrar marcación y subir comprobante/prueba (POST /api/sesiones)"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>{item.comprobante ? "Actualizar Prueba" : "Subir Prueba"}</span>
+                    </button>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           );
