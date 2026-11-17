@@ -93,6 +93,11 @@ export interface AgendarFechasHitoPayload {
   [key: string]: unknown;
 }
 
+export interface EditarFechasHitoPayload {
+  id: number;
+  fechas: string[];
+}
+
 export interface RevisarFechasHitoPayload {
   id: number;
   valido?: boolean;

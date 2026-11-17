@@ -199,6 +199,23 @@ export const hitosApi = baseApi.injectEndpoints({
       ],
     }),
 
+    // PUT /api/hitos/{id}/fechas (Edita las fechas de las sesiones de un hito)
+    editarFechasHito: builder.mutation<
+      { message?: string; mensaje?: string; hito?: HitoAdmin },
+      { id: number; fechas: string[] }
+    >({
+      query: ({ id, fechas }) => ({
+        url: `/hitos/${id}/fechas`,
+        method: "PUT",
+        body: { fechas },
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: "Hito", id },
+        { type: "Hito", id: "LIST" },
+        { type: "Sesion", id: "LIST" },
+      ],
+    }),
+
     // PUT /api/hitos/{id}/revision (Revisa la validez de las fechas del hito)
     revisarFechasHito: builder.mutation<
       { message?: string; mensaje?: string; hito?: HitoAdmin },
@@ -242,6 +259,7 @@ export const {
   useGetHitosAdminQuery,
   useGetHitoAdminByIdQuery,
   useAgendarFechasHitoMutation,
+  useEditarFechasHitoMutation,
   useRevisarFechasHitoMutation,
   useGetHitosQuery,
 } = hitosApi;

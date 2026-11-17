@@ -21,6 +21,7 @@ import { useDebounce } from "@/shared/hooks/useDebounce";
 import {
   useGetHitosAdminQuery,
   useAgendarFechasHitoMutation,
+  useEditarFechasHitoMutation,
   useRevisarFechasHitoMutation,
 } from "../services/hitosApi";
 import type {
@@ -82,6 +83,9 @@ export function HitosPage() {
   const [agendarFechas, { isLoading: isAgendando }] =
     useAgendarFechasHitoMutation();
 
+  const [editarFechas, { isLoading: isEditandoFechas }] =
+    useEditarFechasHitoMutation();
+
   const [revisarFechas, { isLoading: isRevisando }] =
     useRevisarFechasHitoMutation();
 
@@ -135,6 +139,19 @@ export function HitosPage() {
   };
 
   const handleSaveAgendarFechas = async (payload: AgendarFechasHitoPayload) => {
+    // Si el hito ya existe, editar sus fechas con PUT /api/hitos/{id}/fechas
+    if (selectedHitoForAgendar?.id) {
+      await editarFechas({
+        id: selectedHitoForAgendar.id,
+        fechas: payload.fechas,
+      }).unwrap();
+      setSelectedBeneficiaries([]);
+      showNotification(
+        `Fechas del hito #${selectedHitoForAgendar.id} actualizadas exitosamente (PUT /api/hitos/${selectedHitoForAgendar.id}/fechas).`
+      );
+      return;
+    }
+
     // Enviar el array de beneficiarios seleccionados hacia el endpoint en lugar del ID del primer elemento
     const listToSend =
       selectedBeneficiaries.length > 0
@@ -155,8 +172,17 @@ export function HitosPage() {
     await agendarFechas(payloadWithBeneficiaries).unwrap();
     setSelectedBeneficiaries([]);
     showNotification(
-        `Fechas de sesiones registradas exitosamente para ${listToSend.length > 1 ? `${listToSend.length} beneficiarios` : "el beneficiario"
-        } (POST /api/hitos/fechas).`
+      `Fechas de sesiones registradas exitosamente para ${
+        listToSend.length > 1 ? `${listToSend.length} beneficiarios` : "el beneficiario"
+      } (POST /api/hitos/fechas).`
+    );
+  };
+
+  const handleSaveEditarFechas = async ({ id, fechas }: { id: number; fechas: string[] }) => {
+    await editarFechas({ id, fechas }).unwrap();
+    setSelectedBeneficiaries([]);
+    showNotification(
+      `Fechas del hito #${id} actualizadas exitosamente (PUT /api/hitos/${id}/fechas).`
     );
   };
 
@@ -400,14 +426,15 @@ export function HitosPage() {
         onGenerarReporte={handleOpenReporte}
       />
 
-      {/* Modal para POST /api/hitos/fechas */}
+      {/* Modal para POST /api/hitos/fechas o PUT /api/hitos/{id}/fechas */}
       <AgendarFechasModal
         isOpen={Boolean(selectedHitoForAgendar)}
         onClose={() => setSelectedHitoForAgendar(null)}
         hito={selectedHitoForAgendar}
         selectedBeneficiaries={selectedBeneficiaries}
         onAgendar={handleSaveAgendarFechas}
-        isLoading={isAgendando}
+        onEditarFechas={handleSaveEditarFechas}
+        isLoading={isAgendando || isEditandoFechas}
       />
 
       {/* Modal para PUT /api/hitos/{id}/revision */}

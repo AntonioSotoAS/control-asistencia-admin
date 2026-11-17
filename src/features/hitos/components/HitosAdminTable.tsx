@@ -295,16 +295,22 @@ export function HitosAdminTable({
                       </Button>
                     )}
 
-                    {/* Agendar Fechas (POST /api/hitos/fechas) */}
+                    {/* Agendar / Editar Fechas */}
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => onAgendarFechas(item)}
                       leftIcon={<CalendarPlus className="w-3.5 h-3.5 text-guinda" />}
                       className="text-xs font-semibold py-1 h-8"
-                      title="Agendar o editar fechas de sesiones (POST /api/hitos/fechas)"
+                      title={
+                        item.id && ((item.fechas && item.fechas.length > 0) || (item.sesiones && item.sesiones.length > 0))
+                          ? "Editar o agregar fechas de sesiones (PUT /api/hitos/{id}/fechas)"
+                          : "Agendar fechas de sesiones (POST /api/hitos/fechas)"
+                      }
                     >
-                      Agendar
+                      {item.id && ((item.fechas && item.fechas.length > 0) || (item.sesiones && item.sesiones.length > 0))
+                        ? "Editar Fechas"
+                        : "Agendar"}
                     </Button>
 
                     {/* Revisar Validez (PUT /api/hitos/{id}/revision) */}
