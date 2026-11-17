@@ -16,7 +16,7 @@ interface ActosProcesalesTableProps {
   isLoading?: boolean;
   isError?: boolean;
   error?: unknown;
-  onRegistrarPersona: (docId?: string) => void;
+  onRegistrarPersona: (acto: ActoProcesal) => void;
   onRetry?: () => void;
 }
 
@@ -65,7 +65,7 @@ export function ActosProcesalesTable({
           No se encontraron expedientes
         </h4>
         <p className="text-xs text-olivo">
-          Prueba cambiando los criterios de filtro (DNI o rango de fechas de ingreso).
+          Prueba cambiando los criterios de filtro (expediente, DNI o rango de fechas de ingreso).
         </p>
       </div>
     );
@@ -129,7 +129,13 @@ export function ActosProcesalesTable({
               </TableCell>
 
               <TableCell className="font-mono font-bold text-xs text-carbon">
-                {acto.x_doc_id || "—"}
+                {acto.x_doc_id && acto.x_doc_id !== "-" ? (
+                  acto.x_doc_id
+                ) : (
+                  <span className="inline-flex items-center text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200/80 px-1.5 py-0.5 rounded tracking-normal">
+                    Sin DNI
+                  </span>
+                )}
               </TableCell>
 
               <TableCell className="max-w-xs">
@@ -154,7 +160,7 @@ export function ActosProcesalesTable({
                 <Button
                   variant="primary"
                   size="sm"
-                  onClick={() => onRegistrarPersona(acto.x_doc_id || undefined)}
+                  onClick={() => onRegistrarPersona(acto)}
                   leftIcon={<UserPlus className="w-3.5 h-3.5" />}
                   className="bg-[#562599] hover:bg-[#471e7f] text-white text-xs font-bold h-7 px-2.5 shadow-xs"
                   title="Registrar persona y cuenta a partir de este expediente"

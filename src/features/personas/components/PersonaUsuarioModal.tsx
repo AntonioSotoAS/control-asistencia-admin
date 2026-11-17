@@ -16,14 +16,18 @@ import {
   useActualizarPersonaMutation,
 } from "../services/personasApi";
 import { useCrearUsuarioMutation } from "@/features/usuarios/services/usuariosApi";
-import type { Persona, ActualizarPersonaPayload } from "../types/persona.types";
-import type { ActoProcesalCaso } from "@/features/actos-procesales/types/actoProcesal.types";
+import type { ActualizarPersonaPayload, Persona } from "../types/persona.types";
+import type {
+  ActoProcesal,
+  ActoProcesalCaso,
+} from "@/features/actos-procesales/types/actoProcesal.types";
 
 interface PersonaUsuarioModalProps {
   isOpen: boolean;
   onClose: () => void;
   personaToEdit?: Persona | null;
   initialDni?: string;
+  initialActo?: ActoProcesal | null;
   onSuccess?: (msg: string) => void;
 }
 
@@ -32,6 +36,7 @@ export function PersonaUsuarioModal({
   onClose,
   personaToEdit,
   initialDni,
+  initialActo,
   onSuccess,
 }: PersonaUsuarioModalProps) {
   const isEditing = Boolean(personaToEdit);
@@ -103,6 +108,42 @@ export function PersonaUsuarioModal({
       setTelefono(personaToEdit.telefono || "");
       setSeguimiento(personaToEdit.seguimiento || "sin_seguimiento");
       setCrearCuenta(false);
+    } else if (initialActo) {
+      const actoDocClean = (initialActo.x_doc_id || "").replace(/\D/g, "").slice(0, 8);
+      setDni(actoDocClean);
+      setNombres(initialActo.x_nombres || "");
+      setApellidoPaterno(initialActo.x_ape_paterno || "");
+      setApellidoMaterno(initialActo.x_ape_materno || "");
+      const expStr = initialActo.x_formato || initialActo.n_unico || "";
+      setExpediente(expStr);
+      setJuzgado(initialActo.x_nom_instancia || "");
+      setCorreo("");
+      setTelefono("");
+      setSeguimiento("sin_seguimiento");
+      setCrearCuenta(true);
+      setIdentificador(actoDocClean || expStr.replace(/[^a-zA-Z0-9]/g, "").slice(0, 15));
+      setPassword("");
+      setRol("beneficiario");
+      setCuentaActiva(true);
+
+      if (expStr) {
+        setCasosEncontrados([
+          {
+            expediente: expStr,
+            juzgado: initialActo.x_nom_instancia || "",
+            tipo_parte: initialActo.l_tipo_parte || "",
+            f_ingreso_acto: initialActo.f_ingreso_acto || null,
+          },
+        ]);
+      }
+
+      if (actoDocClean.length === 8 && isOpen) {
+        handleBuscarPorDocumento(actoDocClean);
+      } else if (!actoDocClean) {
+        setInfoMessage(
+          "El expediente seleccionado no cuenta con DNI en el sistema de la Corte. Puedes completarlo manualmente o continuar el registro con sus nombres y expediente."
+        );
+      }
     } else {
       const initDniClean = (initialDni || "").replace(/\D/g, "").slice(0, 8);
       setDni(initDniClean);
@@ -124,7 +165,7 @@ export function PersonaUsuarioModal({
         handleBuscarPorDocumento(initDniClean);
       }
     }
-  }, [personaToEdit, isOpen, initialDni]);
+  }, [personaToEdit, isOpen, initialDni, initialActo]);
 
   // Actualizar identificador automáticamente cuando cambia el DNI
   const handleDniChange = (val: string) => {
@@ -206,8 +247,8 @@ export function PersonaUsuarioModal({
     setErrorMessage(null);
     setFieldErrors({});
 
-    if (!dni.trim() || dni.trim().length !== 8) {
-      setErrorMessage("El DNI debe contener exactamente 8 dígitos.");
+    if (dni.trim() && dni.trim().length !== 8) {
+      setErrorMessage("El DNI ingresado debe contener exactamente 8 dígitos.");
       return;
     }
 
@@ -361,9 +402,16 @@ export function PersonaUsuarioModal({
             SECCIÓN 1: DOCUMENTO
         ========================================================================= */}
         <div className="space-y-2">
-          <label className="text-xs font-black uppercase tracking-wider text-ink-primary block">
-            Documento
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-black uppercase tracking-wider text-ink-primary block">
+              Documento (DNI)
+            </label>
+            {!dni && (
+              <span className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60 font-semibold">
+                Opcional si el expediente no tiene DNI
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
               <Input
@@ -375,9 +423,8 @@ export function PersonaUsuarioModal({
                     handleBuscarPorDocumento();
                   }
                 }}
-                placeholder="Número de DNI (8 dígitos) *"
+                placeholder="Número de DNI (8 dígitos)"
                 maxLength={8}
-                required
                 className="font-mono text-sm tracking-wider"
               />
             </div>
@@ -386,8 +433,9 @@ export function PersonaUsuarioModal({
               variant="primary"
               size="sm"
               onClick={() => handleBuscarPorDocumento()}
+              disabled={!dni || dni.length !== 8}
               isLoading={isSearchingDni}
-              className="bg-[#562599] hover:bg-[#471e7f] text-white font-bold h-10 px-3.5 shadow-xs"
+              className="bg-[#562599] hover:bg-[#471e7f] text-white font-bold h-10 px-3.5 shadow-xs disabled:opacity-50"
               title="Buscar nombres y expedientes en la base judicial"
             >
               <Search className="w-4 h-4 mr-1.5" />

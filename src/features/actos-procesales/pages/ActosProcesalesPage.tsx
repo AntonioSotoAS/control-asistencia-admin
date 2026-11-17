@@ -2,18 +2,34 @@ import { useState } from "react";
 import { ActosProcesalesTable } from "../components/ActosProcesalesTable";
 import { PersonaUsuarioModal } from "@/features/personas/components/PersonaUsuarioModal";
 import { Button } from "@/components/ui";
-import { Scale, RefreshCw, CheckCircle2, ChevronLeft, ChevronRight, UserPlus } from "lucide-react";
+import {
+  Scale,
+  RefreshCw,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  UserPlus,
+  X,
+} from "lucide-react";
+import { useDebounce } from "@/shared/hooks/useDebounce";
 import { useGetActosProcesalesQuery } from "../services/actosProcesalesApi";
+import type { ActoProcesal } from "../types/actoProcesal.types";
 
 export function ActosProcesalesPage() {
   const [page, setPage] = useState(1);
   const [limit] = useState(15);
   const [docId, setDocId] = useState("");
+  const [expediente, setExpediente] = useState("");
+  const [soloSinDni, setSoloSinDni] = useState(false);
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
 
+  const debouncedDocId = useDebounce(docId, 400);
+  const debouncedExpediente = useDebounce(expediente, 400);
+
   // Estado para el modal unificado de Registrar Persona y Cuenta
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedActo, setSelectedActo] = useState<ActoProcesal | null>(null);
   const [selectedDocId, setSelectedDocId] = useState<string | undefined>(undefined);
   const [notification, setNotification] = useState<string | null>(null);
 
@@ -28,7 +44,9 @@ export function ActosProcesalesPage() {
   const { data, isLoading, isFetching, isError, error, refetch } = useGetActosProcesalesQuery({
     page,
     limit,
-    x_doc_id: docId.trim() || undefined,
+    x_doc_id: debouncedDocId.trim() || undefined,
+    expediente: debouncedExpediente.trim() || undefined,
+    sin_dni: soloSinDni || undefined,
     fecha_inicio: fechaInicio || undefined,
     fecha_fin: fechaFin || undefined,
     f_ingreso_acto: fallbackSingleDate,
@@ -44,17 +62,22 @@ export function ActosProcesalesPage() {
     }, 4500);
   };
 
-  const handleOpenRegistrar = (targetDocId?: string) => {
-    setSelectedDocId(targetDocId);
+  const handleOpenRegistrar = (targetActo?: ActoProcesal) => {
+    setSelectedActo(targetActo || null);
+    setSelectedDocId(targetActo?.x_doc_id || undefined);
     setIsModalOpen(true);
   };
 
   const handleResetFilters = () => {
     setDocId("");
+    setExpediente("");
+    setSoloSinDni(false);
     setFechaInicio("");
     setFechaFin("");
     setPage(1);
   };
+
+  const hasActiveFilters = Boolean(docId || expediente || soloSinDni || fechaInicio || fechaFin);
 
   return (
     <div className="space-y-6">
@@ -106,24 +129,90 @@ export function ActosProcesalesPage() {
         </div>
 
         {/* Filtros de consulta */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2 border-t border-linea/60 text-xs">
-          <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 pt-2 border-t border-linea/60 text-xs items-end">
+          {/* Documento DNI */}
+          <div className="lg:col-span-3">
             <label className="text-[11px] font-bold text-olivo uppercase block mb-1">
               Documento (DNI)
             </label>
-            <input
-              type="text"
-              value={docId}
-              onChange={(e) => {
-                setDocId(e.target.value);
-                setPage(1);
-              }}
-              placeholder="Buscar por DNI..."
-              className="w-full text-xs font-semibold bg-suave/60 border border-linea rounded-field px-3 py-2 text-carbon focus:outline-none focus:border-guinda focus:bg-white transition font-mono"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={docId}
+                disabled={soloSinDni}
+                onChange={(e) => {
+                  setDocId(e.target.value);
+                  setPage(1);
+                }}
+                placeholder={soloSinDni ? "Filtro sin DNI activo" : "Buscar por DNI..."}
+                className="w-full text-xs font-semibold bg-suave/60 border border-linea rounded-field px-3 py-2 text-carbon focus:outline-none focus:border-guinda focus:bg-white transition font-mono disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              {docId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDocId("");
+                    setPage(1);
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded text-olivo/60 hover:text-carbon"
+                  title="Borrar DNI"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+            <label className="inline-flex items-center gap-1.5 cursor-pointer text-[11px] font-semibold text-olivo hover:text-carbon select-none mt-1.5 transition">
+              <input
+                type="checkbox"
+                checked={soloSinDni}
+                onChange={(e) => {
+                  setSoloSinDni(e.target.checked);
+                  if (e.target.checked) setDocId("");
+                  setPage(1);
+                }}
+                className="rounded border-linea text-[#562599] focus:ring-[#562599] h-3.5 w-3.5 cursor-pointer"
+              />
+              <span>Ver solo sin DNI</span>
+            </label>
           </div>
 
-          <div>
+          {/* Expediente */}
+          <div className="lg:col-span-3">
+            <label className="text-[11px] font-bold text-olivo uppercase block mb-1">
+              Expediente
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={expediente}
+                onChange={(e) => {
+                  setExpediente(e.target.value);
+                  setPage(1);
+                }}
+                placeholder="Buscar por expediente..."
+                className="w-full text-xs font-semibold bg-suave/60 border border-linea rounded-field px-3 py-2 text-carbon focus:outline-none focus:border-guinda focus:bg-white transition font-mono"
+              />
+              {expediente && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setExpediente("");
+                    setPage(1);
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded text-olivo/60 hover:text-carbon"
+                  title="Borrar expediente"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+            <span className="text-[10px] text-olivo/80 block mt-1.5">
+              Ej: 06256-2026, 05544...
+            </span>
+          </div>
+
+          {/* Fecha Inicio */}
+          <div className="lg:col-span-2">
             <label className="text-[11px] font-bold text-olivo uppercase block mb-1">
               Fecha Inicio
             </label>
@@ -136,9 +225,11 @@ export function ActosProcesalesPage() {
               }}
               className="w-full text-xs font-semibold bg-suave/60 border border-linea rounded-field px-3 py-2 text-carbon focus:outline-none focus:border-guinda focus:bg-white transition"
             />
+            <span className="text-[10px] text-transparent block mt-1.5 select-none">-</span>
           </div>
 
-          <div>
+          {/* Fecha Fin */}
+          <div className="lg:col-span-2">
             <label className="text-[11px] font-bold text-olivo uppercase block mb-1">
               Fecha Fin
             </label>
@@ -151,18 +242,23 @@ export function ActosProcesalesPage() {
               }}
               className="w-full text-xs font-semibold bg-suave/60 border border-linea rounded-field px-3 py-2 text-carbon focus:outline-none focus:border-guinda focus:bg-white transition"
             />
+            <span className="text-[10px] text-transparent block mt-1.5 select-none">-</span>
           </div>
 
-          <div className="flex items-end">
-            {(docId || fechaInicio || fechaFin) && (
+          {/* Limpiar Filtros */}
+          <div className="lg:col-span-2 flex flex-col justify-end">
+            {hasActiveFilters ? (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleResetFilters}
-                className="w-full text-xs h-9"
+                className="w-full text-xs h-9 flex items-center justify-center gap-1.5 mb-5"
               >
-                Limpiar Filtros
+                <X className="w-3.5 h-3.5 text-olivo" />
+                <span>Limpiar Filtros</span>
               </Button>
+            ) : (
+              <div className="h-9 mb-5" />
             )}
           </div>
         </div>
@@ -175,7 +271,7 @@ export function ActosProcesalesPage() {
           isLoading={isLoading}
           isError={isError}
           error={error}
-          onRegistrarPersona={(d) => handleOpenRegistrar(d)}
+          onRegistrarPersona={(acto) => handleOpenRegistrar(acto)}
           onRetry={() => refetch()}
         />
 
@@ -218,9 +314,11 @@ export function ActosProcesalesPage() {
       <PersonaUsuarioModal
         isOpen={isModalOpen}
         initialDni={selectedDocId}
+        initialActo={selectedActo}
         onClose={() => {
           setIsModalOpen(false);
           setSelectedDocId(undefined);
+          setSelectedActo(null);
         }}
         onSuccess={showNotification}
       />

@@ -19,7 +19,9 @@ export interface ListarActosProcesalesParams {
   page?: number;
   limit?: number;
   n_unico?: string;
+  expediente?: string;
   x_doc_id?: string;
+  sin_dni?: boolean;
   fecha_inicio?: string;
   fecha_fin?: string;
   desde?: string;
